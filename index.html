@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Unified Digital Tools Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>🚀 Unified Digital Tools Dashboard</h1>
+
+    <div class="header-controls">
+      <button id="back-button" class="action-button" style="display: none;">← Back</button>
+      <button id="home-button" class="action-button">🏠 Home</button>
+    </div>
+
+    <!-- Loading Indicator -->
+    <div class="loading-indicator" id="loading-indicator">
+        <div class="spinner"></div>
+        <p>Processing...</p>
+    </div>
+
+    <!-- MAIN DASHBOARD OVERVIEW SECTION -->
+    <div id="dashboard-overview-section" class="main-view active-view">
+        <h2>All Tools Overview</h2>
+        <p>Select a category or a specific tool to get started.</p>
+
+        <div class="overview-grid">
+            <div class="overview-category-card">
+                <h3>Image Tools</h3>
+                <div class="tool-list">
+                    <button class="overview-tool-button" data-tool="image-resizer" data-category="image-tools">Image Resizer</button>
+                    <button class="overview-tool-button" data-tool="bulk-image-resizer" data-category="image-tools">Bulk Image Resizer</button>
+                    <button class="overview-tool-button" data-tool="image-compressor" data-category="image-tools">Image Compressor</button>
+                    <button class="overview-tool-button" data-tool="crop-image" data-category="image-tools">Crop Image</button>
+                    <button class="overview-tool-button" data-tool="collage-maker" data-category="image-tools">Collage Maker</button>
+                    <button class="overview-tool-button" data-tool="flip-image" data-category="image-tools">Flip Image</button>
+                    <button class="overview-tool-button" data-tool="rotate-image" data-category="image-tools">Rotate Image</button>
+                    <button class="overview-tool-button" data-tool="image-enlarger" data-category="image-tools">Image Enlarger</button>
+                    <button class="overview-tool-button" data-tool="color-picker" data-category="image-tools">Color Picker</button>
+                    <button class="overview-tool-button" data-tool="meme-generator" data-category="image-tools">Meme Generator</button>
+                </div>
+                <button class="overview-category-button" data-category="image-tools">View All Image Tools</button>
+            </div>
+
+            <div class="overview-category-card">
+                <h3>Convert Tools</h3>
+                <div class="tool-list">
+                    <button class="overview-tool-button" data-tool="image-converter" data-category="convert-tools">Image Converter</button>
+                    <button class="overview-tool-button" data-tool="pdf-to-jpg" data-category="convert-tools">PDF to JPG</button>
+                    <button class="overview-tool-button" data-tool="heic-to-jpg" data-category="convert-tools">HEIC to JPG</button>
+                    <button class="overview-tool-button" data-tool="svg-converter" data-category="convert-tools">SVG Converter</button>
+                    <button class="overview-tool-button" data-tool="pdf-to-png" data-category="convert-tools">PDF to PNG</button>
+                    <button class="overview-tool-button" data-tool="png-to-svg" data-category="convert-tools">PNG to SVG</button>
+                    <button class="overview-tool-button" data-tool="webp-to-jpg" data-category="convert-tools">WebP to JPG</button>
+                    <button class="overview-tool-button" data-tool="png-to-jpg" data-category="convert-tools">PNG to JPG</button>
+                    <button class="overview-tool-button" data-tool="jpg-to-png" data-category="convert-tools">JPG to PNG</button>
+                </div>
+                <button class="overview-category-button" data-category="convert-tools">View All Convert Tools</button>
+            </div>
+
+            <div class="overview-category-card">
+                <h3>PDF Tools</h3>
+                <div class="tool-list">
+                    <button class="overview-tool-button" data-tool="merge-pdf" data-category="pdf-tools">Merge PDFs</button>
+                    <button class="overview-tool-button" data-tool="compress-pdf" data-category="pdf-tools">Compress PDF</button>
+                    <button class="overview-tool-button" data-tool="pdf-converter" data-category="pdf-tools">PDF Converter</button>
+                    <button class="overview-tool-button" data-tool="image-to-pdf" data-category="pdf-tools">Image to PDF</button>
+                    <button class="overview-tool-button" data-tool="jpg-to-pdf" data-category="pdf-tools">JPG to PDF</button>
+                    <button class="overview-tool-button" data-tool="png-to-pdf" data-category="pdf-tools">PNG to PDF</button>
+                    <button class="overview-tool-button" data-tool="pdf-to-gif" data-category="pdf-tools">PDF to GIF</button>
+                </div>
+                <button class="overview-category-button" data-category="pdf-tools">View All PDF Tools</button>
+            </div>
+
+            <div class="overview-category-card">
+                <h3>Apps</h3>
+                <div class="tool-list">
+                    <button class="overview-tool-button" data-tool="android-image-converter-app" data-category="apps-tools">Android Image Converter App</button>
+                    <button class="overview-tool-button" data-tool="ios-image-converter-app" data-category="apps-tools">iOS Image Converter</button>
+                    <button class="overview-tool-button" data-tool="android-collage-maker-app" data-category="apps-tools">Android Collage Maker</button>
+                    <button class="overview-tool-button" data-tool="ios-collage-maker-app" data-category="apps-tools">iOS Collage Maker</button>
+                    <button class="overview-tool-button" data-tool="android-video-compressor-app" data-category="apps-tools">Android Video Compressor App</button>
+                    <button class="overview-tool-button" data-tool="ios-video-compressor-app" data-category="apps-tools">iOS Video Compressor App</button>
+                </div>
+                <button class="overview-category-button" data-category="apps-tools">View All Apps</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CATEGORY PAGES & INDIVIDUAL TOOL SECTIONS -->
+    <div id="category-sections-wrapper">
+        <!-- Image Tools Category -->
+        <div id="image-tools-category-section" class="main-view category-view">
+            <h2>Image Tools</h2>
+            <div class="tool-selection-buttons">
+                <button class="tool-button active" data-tool="image-resizer">Image Resizer</button>
+                <button class="tool-button" data-tool="bulk-image-resizer">Bulk Image Resizer</button>
+                <button class="tool-button" data-tool="image-compressor">Image Compressor</button>
+                <button class="tool-button" data-tool="crop-image">Crop Image</button>
+                <button class="tool-button" data-tool="collage-maker">Collage Maker</button>
+                <button class="tool-button" data-tool="flip-image">Flip Image</button>
+                <button class="tool-button" data-tool="rotate-image">Rotate Image</button>
+                <button class="tool-button" data-tool="image-enlarger">Image Enlarger</button>
+                <button class="tool-button" data-tool="color-picker">Color Picker</button>
+                <button class="tool-button" data-tool="meme-generator">Meme Generator</button>
+            </div>
+
+            <!-- Common Image Upload Area -->
+            <div class="file-upload-area" id="image-upload-area">
+                <p>Drag & Drop an image here, or click to select</p>
+                <input type="file" id="upload-image-common" accept="image/*">
+            </div>
+
+            <div id="image-tool-options-container" class="tool-options-container">
+                <!-- Individual Image Tool Options (will be dynamically active) -->
+                <div id="image-resizer-options" class="tool-section active">
+                    <h3>Image Resizer</h3>
+                    <p>Resize your image to specific dimensions.</p>
+                    <div class="input-group">
+                        <label for="width">Width:</label>
+                        <input type="number" id="width" placeholder="e.g. 250" value="300">
+                    </div>
+                    <div class="input-group">
+                        <label for="height">Height:</label>
+                        <input type="number" id="height" placeholder="e.g. 250" value="200">
+                    </div>
+                    <button onclick="resizeImage()">Apply Resize</button>
+                </div>
+
+                <div id="bulk-image-resizer-options" class="tool-section">
+                    <h3>Bulk Image Resizer</h3>
+                    <p>Upload multiple images and resize them all at once.</p>
+                    <div class="input-group">
+                        <label for="bulk-width">Width:</label>
+                        <input type="number" id="bulk-width" placeholder="e.g. 300" value="300">
+                    </div>
+                    <div class="input-group">
+                        <label for="bulk-height">Height:</label>
+                        <input type="number" id="bulk-height" placeholder="e.g. 200" value="200">
+                    </div>
+                    <div class="input-group">
+                        <label for="upload-bulk-images">Images:</label>
+                        <input type="file" id="upload-bulk-images" accept="image/*" multiple>
+                    </div>
+                    <button onclick="bulkImageResizer()">Apply Bulk Resize</button>
+                </div>
+
+                <div id="image-compressor-options" class="tool-section">
+                    <h3>Image Compressor</h3>
+                    <p>Reduce the file size of your image by adjusting quality or format.</p>
+                    <div class="input-group">
+                        <label for="compression-quality">Quality (0-1):</label>
+                        <input type="range" id="compression-quality" min="0" max="1" step="0.05" value="0.8">
+                        <span id="quality-display">0.80</span>
+                    </div>
+                    <div class="input-group">
+                        <label for="output-format">Format:</label>
+                        <select id="output-format">
+                            <option value="image/png">PNG (Lossless)</option>
+                            <option value="image/jpeg">JPEG</option>
+                            <option value="image/webp">WebP</option>
+                        </select>
+                    </div>
+                    <button onclick="compressImage()">Apply Compress</button>
+                </div>
+
+                <div id="crop-image-options" class="tool-section">
+                    <h3>Crop Image</h3>
+                    <p>Drag on the image preview below to select the crop area.</p>
+                    <button onclick="cropImage()">Apply Crop</button>
+                </div>
+
+                <div id="collage-maker-options" class="tool-section">
+                    <h3>Collage Maker</h3>
+                    <p>Combine multiple images into a creative collage.</p>
+                    <div class="input-group">
+                        <label for="upload-collage-images">Images for Collage:</label>
+                        <input type="file" id="upload-collage-images" accept="image/*" multiple>
+                    </div>
+                    <div class="input-group">
+                        <label for="collage-layout">Layout:</label>
+                        <select id="collage-layout">
+                            <option value="horizontal">Horizontal (Side-by-Side)</option>
+                            <option value="vertical">Vertical (Stacked)</option>
+                            <option value="2x2">2x2 Grid</option>
+                            <option value="1x2">1x2 (One on top, two below)</option>
+                            <option value="2x1">2x1 (Two on top, one below)</option>
+                        </select>
+                    </div>
+                    <button onclick="makeCollage()">Make Collage</button>
+                </div>
+
+                <div id="flip-image-options" class="tool-section">
+                    <h3>Flip Image</h3>
+                    <p>Flip the image horizontally or vertically.</p>
+                    <button onclick="flipImage('horizontal')">Flip Horizontally</button>
+                    <button onclick="flipImage('vertical')">Flip Vertically</button>
+                </div>
+
+                <div id="rotate-image-options" class="tool-section">
+                    <h3>Rotate Image</h3>
+                    <p>Rotate the image by 90 degrees clockwise or counter-clockwise.</p>
+                    <button onclick="rotateImage(90)">Rotate 90° CW</button>
+                    <button onclick="rotateImage(-90)">Rotate 90° CCW</button>
+                </div>
+
+                <div id="image-enlarger-options" class="tool-section">
+                    <h3>Image Enlarger</h3>
+                    <p>Enlarge your image. Note: Simple enlargement can lead to pixelation. For best results, consider AI-powered upscaling (not yet implemented).</p>
+                    <div class="input-group">
+                        <label for="enlarger-scale">Scale Factor:</label>
+                        <input type="number" id="enlarger-scale" placeholder="e.g. 2" value="2" min="1" step="0.1">
+                    </div>
+                    <button onclick="enlargeImage()">Enlarge Image</button>
+                </div>
+
+                <div id="color-picker-options" class="tool-section">
+                    <h3>Color Picker</h3>
+                    <p>Click on the image below to pick a color.</p>
+                    <div class="color-display-box" id="color-display-box" style="width:50px; height:20px; border:1px solid #ccc; background-color: #f0f0f0;"></div>
+                    <p>Selected Color: <span id="picked-color-value">#FFFFFF</span></p>
+                </div>
+
+                <div id="meme-generator-options" class="tool-section">
+                    <h3>Meme Generator</h3>
+                    <p>Add text to your images to create memes. Drag on image to adjust text position.</p>
+                    <div class="input-group">
+                        <label for="meme-top-text">Top Text:</label>
+                        <input type="text" id="meme-top-text" placeholder="Top Text">
+                    </div>
+                    <div class="input-group">
+                        <label for="meme-bottom-text">Bottom Text:</label>
+                        <input type="text" id="meme-bottom-text" placeholder="Bottom Text">
+                    </div>
+                    <div class="input-group">
+                        <label for="meme-font-size">Font Size:</label>
+                        <input type="number" id="meme-font-size" value="50" min="10" max="200">
+                    </div>
+                    <div class="input-group">
+                        <label for="meme-font-family">Font:</label>
+                        <select id="meme-font-family">
+                            <option value="Impact">Impact</option>
+                            <option value="Arial">Arial</option>
+                            <option value="Verdana">Verdana</option>
+                            <option value="Times New Roman">Times New Roman</option>
+                            <option value="Courier New">Courier New</option>
+                        </select>
+                    </div>
+                    <button onclick="generateMeme()">Generate Meme</button>
+                </div>
+
+                <!-- Legacy Merge and Split (kept for backward compatibility, new users should use Collage/Bulk) -->
+                <div id="merge-options" class="tool-section">
+                    <h3>Merge Images (Legacy)</h3>
+                    <p>This is the old merge functionality. For more advanced combining, consider 'Collage Maker'.</p>
+                    <div class="input-group">
+                        <label for="upload-merge-2">Image 2:</label>
+                        <input type="file" id="upload-merge-2" accept="image/*">
+                    </div>
+                    <div class="input-group">
+                        <label for="merge-direction">Direction:</label>
+                        <select id="merge-direction">
+                            <option value="horizontal">Horizontal</option>
+                            <option value="vertical">Vertical</option>
+                        </select>
+                    </div>
+                    <button onclick="mergeImages()">Apply Merge</button>
+                </div>
+
+                <div id="split-options" class="tool-section">
+                    <h3>Split Image (Legacy)</h3>
+                    <p>Split a single image into multiple smaller pieces.</p>
+                    <div class="input-group">
+                        <label for="split-rows">Rows:</label>
+                        <input type="number" id="split-rows" value="2" min="1">
+                    </div>
+                    <div class="input-group">
+                        <label for="split-cols">Columns:</label>
+                        <input type="number" id="split-cols" value="2" min="1">
+                    </div>
+                    <button onclick="splitImage()">Apply Split</button>
+                </div>
+            </div>
+
+            <div class="editor-area image-editor-area">
+              <canvas id="image-canvas"></canvas>
+              <img id="image-result" alt="Processed Image">
+              <div id="split-images-display"></div>
+              <div id="image-message" class="editor-message">Upload an image to get started.</div>
+            </div>
+
+            <div class="action-buttons">
+              <button id="image-undo-button" onclick="undoLastImageOperation()" disabled>Undo</button>
+              <a id="image-download" href="#" download="processed-image.png">Download Image</a>
+            </div>
+        </div>
+
+        <!-- Convert Tools Category -->
+        <div id="convert-tools-category-section" class="main-view category-view">
+            <h2>File Conversion Tools</h2>
+            <div class="tool-selection-buttons">
+                <button class="tool-button active" data-tool="image-converter">Image Converter</button>
+                <button class="tool-button" data-tool="pdf-to-jpg">PDF to JPG</button>
+                <button class="tool-button" data-tool="heic-to-jpg">HEIC to JPG</button>
+                <button class="tool-button" data-tool="svg-converter">SVG Converter</button>
+                <button class="tool-button" data-tool="pdf-to-png">PDF to PNG</button>
+                <button class="tool-button" data-tool="png-to-svg">PNG to SVG</button>
+                <button class="tool-button" data-tool="webp-to-jpg">WebP to JPG</button>
+                <button class="tool-button" data-tool="png-to-jpg">PNG to JPG</button>
+                <button class="tool-button" data-tool="jpg-to-png">JPG to PNG</button>
+            </div>
+
+            <div class="file-upload-area" id="convert-upload-area">
+                <p>Drag & Drop files here, or click to select</p>
+                <input type="file" id="upload-convert-files-common" accept="*/*" multiple>
+            </div>
+
+            <div id="convert-tool-options-container" class="tool-options-container">
+                <div id="image-converter-options" class="tool-section active">
+                    <h3>Image Converter</h3>
+                    <p>Convert images between various formats (JPG, PNG, WebP).</p>
+                    <div class="input-group">
+                        <label for="image-convert-format">Convert To:</label>
+                        <select id="image-convert-format">
+                            <option value="image/jpeg">JPG</option>
+                            <option value="image/png">PNG</option>
+                            <option value="image/webp">WebP</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label for="upload-image-converter-input">Image:</label>
+                        <input type="file" id="upload-image-converter-input" accept="image/*">
+                    </div>
+                    <button onclick="imageConverter()">Convert Image</button>
+                </div>
+                <div id="pdf-to-jpg-options" class="tool-section">
+                    <h3>PDF to JPG (Coming Soon)</h3>
+                    <p>Convert pages from a PDF document to JPG images. This feature requires a large client-side PDF rendering library (<a href="https://mozilla.github.io/pdf.js/" target="_blank" class="external-link">pdf.js</a> or similar) which is not included to keep the app lightweight.</p>
+                    <input type="file" id="upload-pdf-to-jpg" accept=".pdf" disabled>
+                    <button disabled>Convert PDF to JPG</button>
+                </div>
+                <div id="heic-to-jpg-options" class="tool-section">
+                    <h3>HEIC to JPG (Coming Soon)</h3>
+                    <p>Convert HEIC (High Efficiency Image File Format) images to JPG. This feature requires a specific HEIC decoding library.</p>
+                    <input type="file" id="upload-heic-to-jpg" accept=".heic" disabled>
+                    <button disabled>Convert HEIC to JPG</button>
+                </div>
+                <div id="svg-converter-options" class="tool-section">
+                    <h3>SVG Converter</h3>
+                    <p>Convert SVG files to PNG or JPG (rasterization).</p>
+                    <div class="input-group">
+                        <label for="svg-convert-format">Convert To:</label>
+                        <select id="svg-convert-format">
+                            <option value="image/png">PNG</option>
+                            <option value="image/jpeg">JPG</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label for="upload-svg-converter-input">SVG File:</label>
+                        <input type="file" id="upload-svg-converter-input" accept=".svg">
+                    </div>
+                    <button onclick="svgConverter()">Convert SVG</button>
+                </div>
+                <div id="pdf-to-png-options" class="tool-section">
+                    <h3>PDF to PNG (Coming Soon)</h3>
+                    <p>Convert pages from a PDF document to PNG images. This feature requires a large client-side PDF rendering library (<a href="https://mozilla.github.io/pdf.js/" target="_blank" class="external-link">pdf.js</a> or similar) which is not included to keep the app lightweight.</p>
+                    <input type="file" id="upload-pdf-to-png" accept=".pdf" disabled>
+                    <button disabled>Convert PDF to PNG</button>
+                </div>
+                <div id="png-to-svg-options" class="tool-section">
+                    <h3>PNG to SVG (Coming Soon)</h3>
+                    <p>Convert PNG raster images to SVG vector graphics. This is a very complex operation that typically requires advanced algorithms or AI, not simple client-side conversion.</p>
+                    <input type="file" id="upload-png-to-svg" accept=".png" disabled>
+                    <button disabled>Convert PNG to SVG</button>
+                </div>
+                <div id="webp-to-jpg-options" class="tool-section">
+                    <h3>WebP to JPG (Use Image Converter)</h3>
+                    <p>Use the <a href="#" onclick="showTool('image-converter', 'convert-tools')">Image Converter</a> tool to convert WebP to JPG/PNG.</p>
+                </div>
+                <div id="png-to-jpg-options" class="tool-section">
+                    <h3>PNG to JPG (Use Image Converter)</h3>
+                    <p>Use the <a href="#" onclick="showTool('image-converter', 'convert-tools')">Image Converter</a> tool to convert PNG to JPG/WebP.</p>
+                </div>
+                <div id="jpg-to-png-options" class="tool-section">
+                    <h3>JPG to PNG (Use Image Converter)</h3>
+                    <p>Use the <a href="#" onclick="showTool('image-converter', 'convert-tools')">Image Converter</a> tool to convert JPG to PNG/WebP.</p>
+                </div>
+            </div>
+
+            <div class="editor-area convert-editor-area">
+                <p id="convert-message" class="editor-message">Upload files to start processing.</p>
+                <a id="convert-download" style="display: none;" class="download-button" href="#" download="converted_file.zip">Download Converted File</a>
+                <div id="bulk-convert-results" class="split-images-display"></div>
+            </div>
+        </div>
+
+        <!-- PDF Tools Category -->
+        <div id="pdf-tools-category-section" class="main-view category-view">
+            <h2>PDF Utilities</h2>
+            <div class="tool-selection-buttons">
+                <button class="tool-button active" data-tool="merge-pdf">Merge PDFs</button>
+                <button class="tool-button" data-tool="compress-pdf">Compress PDF</button>
+                <button class="tool-button" data-tool="pdf-converter">PDF Converter</button>
+                <button class="tool-button" data-tool="image-to-pdf">Image to PDF</button>
+                <button class="tool-button" data-tool="jpg-to-pdf">JPG to PDF</button>
+                <button class="tool-button" data-tool="png-to-pdf">PNG to PDF</button>
+                <button class="tool-button" data-tool="pdf-to-gif">PDF to GIF</button>
+            </div>
+
+            <div class="file-upload-area" id="pdf-upload-area">
+                <p>Drag & Drop PDF/Image files here, or click to select</p>
+                <input type="file" id="upload-pdf-common" accept=".pdf,image/*" multiple>
+            </div>
+
+            <div id="pdf-tool-options-container" class="tool-options-container">
+                <!-- Individual PDF Tool Options -->
+                <div id="merge-pdf-options" class="tool-section active">
+                    <h3>Merge Multiple PDFs</h3>
+                    <p>Select multiple PDF files to combine them into one.</p>
+                    <div class="input-group">
+                        <label for="upload-pdfs">PDF Files:</label>
+                        <input type="file" id="upload-pdfs" accept=".pdf" multiple>
+                    </div>
+                    <button onclick="mergePdfs()">Merge PDFs</button>
+                </div>
+
+                <div id="compress-pdf-options" class="tool-section">
+                    <h3>Compress PDF</h3>
+                    <p>Reduce the file size of a PDF document by compressing images within it.</p>
+                    <div class="input-group">
+                        <label for="pdf-compress-quality">Image Quality (0-1):</label>
+                        <input type="range" id="pdf-compress-quality" min="0" max="1" step="0.05" value="0.7">
+                        <span id="pdf-quality-display">0.70</span>
+                    </div>
+                    <div class="input-group">
+                        <label for="upload-compress-pdf">PDF File:</label>
+                        <input type="file" id="upload-compress-pdf" accept=".pdf">
+                    </div>
+                    <button onclick="compressPdf()">Compress PDF</button>
+                </div>
+
+                <div id="pdf-converter-options" class="tool-section">
+                    <h3>PDF Converter (Coming Soon)</h3>
+                    <p>Convert PDF documents to other formats like DOCX, TXT, HTML. This requires advanced parsing and rendering.</p>
+                    <input type="file" accept=".pdf" disabled>
+                    <select disabled>
+                        <option>Select Format</option>
+                        <option>DOCX</option>
+                        <option>TXT</option>
+                        <option>HTML</option>
+                    </select>
+                    <button disabled>Convert PDF</button>
+                </div>
+
+                <div id="image-to-pdf-options" class="tool-section">
+                    <h3>Convert Images to PDF</h3>
+                    <p>Select one or more image files to create a single PDF document.</p>
+                    <div class="input-group">
+                        <label for="upload-images-to-pdf">Image Files:</label>
+                        <input type="file" id="upload-images-to-pdf" accept="image/*" multiple>
+                    </div>
+                    <button onclick="imagesToPdf()">Convert to PDF</button>
+                </div>
+
+                <div id="jpg-to-pdf-options" class="tool-section">
+                    <h3>JPG to PDF</h3>
+                    <p>Convert JPG images to a PDF document.</p>
+                    <div class="input-group">
+                        <label for="upload-jpgs-to-pdf">JPG Files:</label>
+                        <input type="file" id="upload-jpgs-to-pdf" accept=".jpg,.jpeg" multiple>
+                    </div>
+                    <button onclick="jpgsToPdf()">Convert JPG to PDF</button>
+                </div>
+
+                <div id="png-to-pdf-options" class="tool-section">
+                    <h3>PNG to PDF</h3>
+                    <p>Convert PNG images to a PDF document.</p>
+                    <div class="input-group">
+                        <label for="upload-pngs-to-pdf">PNG Files:</label>
+                        <input type="file" id="upload-pngs-to-pdf" accept=".png" multiple>
+                    </div>
+                    <button onclick="pngsToPdf()">Convert PNG to PDF</button>
+                </div>
+
+                <div id="pdf-to-gif-options" class="tool-section">
+                    <h3>PDF to GIF (Coming Soon)</h3>
+                    <p>Convert pages from a PDF document to an animated GIF. This requires PDF rendering and GIF encoding libraries.</p>
+                    <input type="file" accept=".pdf" disabled>
+                    <button disabled>Convert PDF to GIF</button>
+                </div>
+            </div>
+
+            <div class="editor-area pdf-editor-area">
+                <p id="pdf-message" class="editor-message">Upload files to start processing.</p>
+                <a id="pdf-download" style="display: none;" class="download-button" href="#" download="processed.pdf">Download PDF</a>
+            </div>
+        </div>
+
+        <!-- Apps Category -->
+        <div id="apps-tools-category-section" class="main-view category-view">
+            <h2>Mobile Apps</h2>
+            <div class="tool-selection-buttons">
+                <button class="tool-button active" data-tool="android-image-converter-app">Android Image Converter App</button>
+                <button class="tool-button" data-tool="ios-image-converter-app">iOS Image Converter</button>
+                <button class="tool-button" data-tool="android-collage-maker-app">Android Collage Maker</button>
+                <button class="tool-button" data-tool="ios-collage-maker-app">iOS Collage Maker</button>
+                <button class="tool-button" data-tool="android-video-compressor-app">Android Video Compressor App</button>
+                <button class="tool-button" data-tool="ios-video-compressor-app">iOS Video Compressor App</button>
+            </div>
+
+            <div id="apps-tool-options-container" class="tool-options-container">
+                <div id="android-image-converter-app-options" class="tool-section active">
+                    <h3>Android Image Converter App (Coming Soon)</h3>
+                    <p>Information about our Android Image Converter App will be here. Stay tuned for download links!</p>
+                </div>
+                <div id="ios-image-converter-app-options" class="tool-section">
+                    <h3>iOS Image Converter App (Coming Soon)</h3>
+                    <p>Information about our iOS Image Converter App will be here. Stay tuned for download links!</p>
+                </div>
+                <div id="android-collage-maker-app-options" class="tool-section">
+                    <h3>Android Collage Maker App (Coming Soon)</h3>
+                    <p>Information about our Android Collage Maker App will be here. Stay tuned for download links!</p>
+                </div>
+                <div id="ios-collage-maker-app-options" class="tool-section">
+                    <h3>iOS Collage Maker App (Coming Soon)</h3>
+                    <p>Information about our iOS Collage Maker App will be here. Stay tuned for download links!</p>
+                </div>
+                <div id="android-video-compressor-app-options" class="tool-section">
+                    <h3>Android Video Compressor App (Coming Soon)</h3>
+                    <p>Information about our Android Video Compressor App will be here. Stay tuned for download links!</p>
+                </div>
+                <div id="ios-video-compressor-app-options" class="tool-section">
+                    <h3>iOS Video Compressor App (Coming Soon)</h3>
+                    <p>Information about our iOS Video Compressor App will be here. Stay tuned for download links!</p>
+                </div>
+            </div>
+
+            <div class="editor-area apps-editor-area">
+                <p id="apps-message" class="editor-message">Select an app above for more details.</p>
+            </div>
+        </div>
+    </div>
+  </div>
+  <!-- PDF-LIB CDN -->
+  <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
