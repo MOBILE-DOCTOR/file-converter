@@ -27,6 +27,7 @@ const categorySections = {
     'image-tools': document.getElementById('image-tools-category-section'),
     'convert-tools': document.getElementById('convert-tools-category-section'),
     'pdf-tools': document.getElementById('pdf-tools-category-section'),
+    'video-tools': document.getElementById('video-tools-category-section'), // NEW VIDEO CATEGORY
     'apps-tools': document.getElementById('apps-tools-category-section'),
 };
 
@@ -53,6 +54,17 @@ const uploadCollageImagesInput = document.getElementById('upload-collage-images'
 const collageLayoutSelect = document.getElementById('collage-layout'); // Collage Maker layout
 const enlargerScaleInput = document.getElementById('enlarger-scale'); // Image Enlarger
 
+// Convert Any File to Image elements
+const uploadFileToImageInput = document.getElementById('upload-file-to-image');
+const detectedFileTypeSpan = document.getElementById('detected-file-type');
+const conversionStatusSpan = document.getElementById('conversion-status');
+const targetImageFormatSelect = document.getElementById('target-image-format');
+const convertFileToImageButton = document.getElementById('convert-file-to-image-button');
+
+// Logo Design elements
+const logoDescriptionInput = document.getElementById('logo-description');
+const logoDesignFilenameInput = document.getElementById('logo-design-filename');
+
 
 // --- DOM Elements - Convert Tools ---
 const convertMessage = document.getElementById('convert-message');
@@ -64,6 +76,9 @@ const imageConvertFormatSelect = document.getElementById('image-convert-format')
 const uploadSvgConverterInput = document.getElementById('upload-svg-converter-input'); // Specific for SVG converter
 const svgConvertFormatSelect = document.getElementById('svg-convert-format'); // Specific for SVG converter
 const bulkConvertResultsDisplay = document.getElementById('bulk-convert-results'); // For bulk convert results
+
+// PDF to JPG specific elements
+const uploadPdfToJpgInput = document.getElementById('upload-pdf-to-jpg');
 
 
 // --- DOM Elements - PDF Tools ---
@@ -79,6 +94,12 @@ const pdfQualityDisplay = document.getElementById('pdf-quality-display'); // For
 const pdfMessage = document.getElementById('pdf-message');
 const pdfDownloadLink = document.getElementById('pdf-download');
 
+// --- DOM Elements - Video Tools --- // NEW VIDEO TOOL ELEMENTS
+const videoUploadArea = document.getElementById('video-upload-area');
+const uploadVideoCommonInput = document.getElementById('upload-video-common');
+const videoMessage = document.getElementById('video-message');
+const videoDownloadLink = document.getElementById('video-download');
+
 
 // --- DOM Elements - Apps Tools ---
 const appsMessage = document.getElementById('apps-message');
@@ -88,6 +109,21 @@ const appsMessage = document.getElementById('apps-message');
 
 function showLoading() { loadingIndicator.style.display = 'flex'; }
 function hideLoading() { loadingIndicator.style.display = 'none'; }
+
+// Helper to get filename from input or use default
+function getDownloadFilename(inputElementId, defaultFilename, extension) {
+    const input = document.getElementById(inputElementId);
+    let filename = input?.value.trim();
+    if (!filename) {
+        filename = defaultFilename;
+    }
+    // Ensure filename has the correct extension if not already present
+    if (extension && !filename.toLowerCase().endsWith(`.${extension.toLowerCase()}`)) {
+        filename += `.${extension.toLowerCase()}`;
+    }
+    return filename;
+}
+
 
 // Resets and displays image result area (for single image outputs)
 function updateImageResult(dataUrl, filename = 'processed-image.png') {
@@ -275,7 +311,7 @@ function showTool(toolId, categoryId, pushToHistory = true) {
     if (categoryId === 'image-tools') {
         if (uploadedImage) {
             // For tools that interact directly with canvas or require current image on canvas
-            if (['image-resizer', 'image-compressor', 'crop-image', 'flip-image', 'rotate-image', 'color-picker', 'meme-generator', 'merge-options', 'split-options'].includes(toolId)) {
+            if (['image-resizer', 'image-compressor', 'crop-image', 'flip-image', 'rotate-image', 'color-picker', 'meme-generator', 'merge-options', 'split-options', 'collage-maker', 'image-enlarger', 'convert-to-image', 'logo-design'].includes(toolId)) {
                 updateCanvasWithImage(uploadedImage, toolId === 'meme-generator'); // Draw meme text if it's meme tool
             } else { // For other tools, just show the last result image or the current state
                 applyLastImageState();
@@ -326,7 +362,20 @@ function showTool(toolId, categoryId, pushToHistory = true) {
             // Ensure font size and family are set correctly
             if (memeFontSizeInput) memeFontSizeInput.value = parseInt(memeFontSizeInput.value); // Ensure it's a number
             if (memeFontFamilySelect) memeFontFamilySelect.value = memeFontFamilySelect.value;
+        } else if (toolId === 'convert-to-image') {
+            // Reset convert to image status
+            detectedFileTypeSpan.textContent = 'N/A';
+            conversionStatusSpan.textContent = 'Please upload a file.';
+            conversionStatusSpan.style.color = '#666';
+            convertFileToImageButton.disabled = true;
+            if (uploadFileToImageInput) uploadFileToImageInput.value = ''; // Clear file input
+        } else if (toolId === 'logo-design') {
+            // Clear logo description and filename inputs
+            if (logoDescriptionInput) logoDescriptionInput.value = '';
+            if (logoDesignFilenameInput) logoDesignFilenameInput.value = 'my-new-logo.png';
+            imageMessage.textContent = 'Enter your logo idea and click "Generate Logo".';
         }
+
 
     } else if (categoryId === 'pdf-tools') {
         pdfUploadArea.style.display = 'flex';
@@ -347,6 +396,12 @@ function showTool(toolId, categoryId, pushToHistory = true) {
         bulkConvertResultsDisplay.innerHTML = '';
         bulkConvertResultsDisplay.style.display = 'none';
 
+    } else if (categoryId === 'video-tools') { // NEW VIDEO TOOL HANDLER
+        videoUploadArea.style.display = 'flex';
+        videoMessage.style.display = 'block';
+        videoMessage.textContent = 'Upload a video to get started.';
+        videoDownloadLink.style.display = 'none';
+
     } else if (categoryId === 'apps-tools') {
         appsMessage.style.display = 'block';
         appsMessage.textContent = `You selected: ${toolId.replace(/-/g, ' ').toUpperCase()}. This section provides information about our dedicated mobile applications. Functionality not yet implemented.`;
@@ -354,6 +409,7 @@ function showTool(toolId, categoryId, pushToHistory = true) {
         imageUploadArea.style.display = 'none';
         pdfUploadArea.style.display = 'none';
         convertUploadArea.style.display = 'none';
+        videoUploadArea.style.display = 'none'; // Also hide video upload area for apps
     }
 
     // Handle placeholder sections for new tools within any category
@@ -376,6 +432,9 @@ function showTool(toolId, categoryId, pushToHistory = true) {
         } else if (categoryId === 'pdf-tools') {
             pdfMessage.style.display = 'block';
             pdfDownloadLink.style.display = 'none';
+        } else if (categoryId === 'video-tools') { // NEW VIDEO TOOL MESSAGE FOR PLACEHOLDER
+            videoMessage.style.display = 'block';
+            videoDownloadLink.style.display = 'none';
         }
     }
 }
@@ -400,6 +459,9 @@ function resetEditorAreas() {
     bulkConvertResultsDisplay.innerHTML = '';
     bulkConvertResultsDisplay.style.display = 'none';
 
+    videoMessage.style.display = 'none'; // NEW: Reset video message
+    videoDownloadLink.style.display = 'none'; // NEW: Reset video download link
+    videoUploadArea.style.display = 'none'; // NEW: Hide video upload area
 
     appsMessage.style.display = 'none'; // Hide apps message initially
 }
@@ -409,20 +471,32 @@ function resetEditorAreas() {
 
 // Handles image resizing
 function resizeImage() {
-    if (!uploadedImage) { alert("Please upload an image first."); return; }
+    if (!uploadedImage) {
+        imageMessage.textContent = "Please upload an image first.";
+        imageMessage.style.color = 'orange';
+        return;
+    }
     showLoading();
     const width = parseInt(document.getElementById('width').value);
     const height = parseInt(document.getElementById('height').value);
     if (isNaN(width) || width <= 0 || isNaN(height) || height <= 0) {
-        alert("Please enter valid positive numbers for dimensions."); hideLoading(); return; }
+        imageMessage.textContent = "Please enter valid positive numbers for dimensions.";
+        imageMessage.style.color = 'red';
+        hideLoading();
+        return;
+    }
     saveImageState();
     const tempCanvas = document.createElement('canvas'); const tempCtx = tempCanvas.getContext('2d');
     tempCanvas.width = width; tempCanvas.height = height;
     tempCtx.drawImage(uploadedImage, 0, 0, width, height);
     const resizedDataUrl = tempCanvas.toDataURL('image/png');
+    const filename = getDownloadFilename('image-resizer-filename', 'resized-image.png', 'png');
     const newResizedImage = new Image(); newResizedImage.onload = () => {
-        uploadedImage = newResizedImage; updateImageResult(resizedDataUrl, `resized-${width}x${height}.png`);
-        currentImageState = resizedDataUrl; hideLoading(); };
+        uploadedImage = newResizedImage; updateImageResult(resizedDataUrl, filename);
+        currentImageState = resizedDataUrl; hideLoading();
+        imageMessage.textContent = "Image resized successfully!";
+        imageMessage.style.color = '#28a745';
+    };
     newResizedImage.src = resizedDataUrl;
 }
 
@@ -430,13 +504,15 @@ function resizeImage() {
 async function bulkImageResizer() {
     const files = bulkImageResizerInput.files;
     if (files.length === 0) {
-        alert("Please select images for bulk resizing.");
+        imageMessage.textContent = "Please select images for bulk resizing.";
+        imageMessage.style.color = 'orange';
         return;
     }
     const width = parseInt(document.getElementById('bulk-width').value);
     const height = parseInt(document.getElementById('bulk-height').value);
     if (isNaN(width) || width <= 0 || isNaN(height) || height <= 0) {
-        alert("Please enter valid positive numbers for dimensions.");
+        imageMessage.textContent = "Please enter valid positive numbers for dimensions.";
+        imageMessage.style.color = 'red';
         return;
     }
     showLoading();
@@ -444,7 +520,9 @@ async function bulkImageResizer() {
     splitImagesDisplay.style.display = 'flex'; // Show container for results
 
     const zip = new JSZip(); // Using JSZip for downloading multiple files
+    const zipFilename = getDownloadFilename('bulk-image-resizer-filename', 'resized_images.zip', 'zip');
 
+    let processedCount = 0;
     for (let i = 0; i < files.length; i++) {
         const file = files[i];
         if (!file.type.startsWith('image/')) {
@@ -484,16 +562,17 @@ async function bulkImageResizer() {
         // Add to zip file
         const base64Data = resizedDataUrl.split(',')[1];
         zip.file(newFilename, base64Data, { base64: true });
+        processedCount++;
     }
 
-    if (files.length > 0) {
+    if (processedCount > 0) {
         zip.generateAsync({ type: "blob" })
             .then(function (content) {
                 const url = URL.createObjectURL(content);
                 imageDownloadLink.href = url;
-                imageDownloadLink.download = 'bulk_resized_images.zip';
+                imageDownloadLink.download = zipFilename;
                 imageDownloadLink.style.display = 'inline-block';
-                imageMessage.textContent = `Successfully resized ${files.length} images. Download as ZIP.`;
+                imageMessage.textContent = `Successfully resized ${processedCount} images. Download as ZIP.`;
                 imageMessage.style.color = '#28a745';
             })
             .finally(() => hideLoading());
@@ -510,7 +589,11 @@ async function bulkImageResizer() {
 
 // Handles image compression
 function compressImage() {
-    if (!uploadedImage) { alert("Please upload an image first."); return; }
+    if (!uploadedImage) {
+        imageMessage.textContent = "Please upload an image first.";
+        imageMessage.style.color = 'orange';
+        return;
+    }
     showLoading(); saveImageState();
     const quality = parseFloat(document.getElementById('compression-quality').value);
     const format = document.getElementById('output-format').value;
@@ -521,12 +604,19 @@ function compressImage() {
     try {
         if (format === 'image/png') { compressedDataUrl = tempCanvas.toDataURL('image/png'); }
         else { compressedDataUrl = tempCanvas.toDataURL(format, quality); }
-    } catch (e) { alert("Error compressing image. Ensure the selected format is supported by your browser and image type.");
-        console.error(e); hideLoading(); return; }
-    const extension = format.split('/')[1].replace('jpeg', 'jpg');
+    } catch (e) {
+        imageMessage.textContent = "Error compressing image. Ensure the selected format is supported by your browser and image type.";
+        imageMessage.style.color = 'red';
+        console.error(e); hideLoading(); return;
+    }
+    const extension = format.split('/')[1].replace('jpeg', 'jpg').replace('image/', '');
+    const filename = getDownloadFilename('image-compressor-filename', `compressed-image.${extension}`, extension);
     const newCompressedImage = new Image(); newCompressedImage.onload = () => {
-        uploadedImage = newCompressedImage; updateImageResult(compressedDataUrl, `compressed-image.${extension}`);
-        currentImageState = compressedDataUrl; hideLoading(); };
+        uploadedImage = newCompressedImage; updateImageResult(compressedDataUrl, filename);
+        currentImageState = compressedDataUrl; hideLoading();
+        imageMessage.textContent = "Image compressed successfully!";
+        imageMessage.style.color = '#28a745';
+    };
     newCompressedImage.src = compressedDataUrl;
 }
 
@@ -562,9 +652,16 @@ function drawCrop(e) {
 }
 function endCrop() { isCropping = false; }
 function cropImage() {
-    if (!uploadedImage) { alert("Please upload an image first."); return; }
+    if (!uploadedImage) {
+        imageMessage.textContent = "Please upload an image first.";
+        imageMessage.style.color = 'orange';
+        return;
+    }
     if (Math.abs(cropSelection.width) < 5 || Math.abs(cropSelection.height) < 5) {
-        alert("Please select a valid crop area on the image by dragging (at least 5x5 pixels)."); return; }
+        imageMessage.textContent = "Please select a valid crop area on the image by dragging (at least 5x5 pixels).";
+        imageMessage.style.color = 'red';
+        return;
+    }
     showLoading(); saveImageState();
     const croppedCanvas = document.createElement('canvas'); const croppedCtx = croppedCanvas.getContext('2d');
     const actualWidth = Math.abs(cropSelection.width); const actualHeight = Math.abs(cropSelection.height);
@@ -573,9 +670,13 @@ function cropImage() {
     croppedCanvas.width = actualWidth; croppedCanvas.height = actualHeight;
     croppedCtx.drawImage(uploadedImage, actualX, actualY, actualWidth, actualHeight, 0, 0, actualWidth, actualHeight);
     const croppedDataUrl = croppedCanvas.toDataURL('image/png');
+    const filename = getDownloadFilename('crop-image-filename', 'cropped-image.png', 'png');
     const newCroppedImage = new Image(); newCroppedImage.onload = () => {
-        uploadedImage = newCroppedImage; updateImageResult(croppedDataUrl, `cropped-image.png`);
-        currentImageState = croppedDataUrl; hideLoading(); };
+        uploadedImage = newCroppedImage; updateImageResult(croppedDataUrl, filename);
+        currentImageState = croppedDataUrl; hideLoading();
+        imageMessage.textContent = "Image cropped successfully!";
+        imageMessage.style.color = '#28a745';
+    };
     newCroppedImage.src = croppedDataUrl;
     cropSelection = { x: 0, y: 0, width: 0, height: 0, active: false };
     if (uploadedImage) { updateCanvasWithImage(uploadedImage); }
@@ -583,12 +684,20 @@ function cropImage() {
 
 // Handles splitting images (legacy, kept for compatibility)
 function splitImage() {
-    if (!uploadedImage) { alert("Please upload an image first."); return; }
+    if (!uploadedImage) {
+        imageMessage.textContent = "Please upload an image first.";
+        imageMessage.style.color = 'orange';
+        return;
+    }
     showLoading(); saveImageState();
     const rows = parseInt(document.getElementById('split-rows').value);
     const cols = parseInt(document.getElementById('split-cols').value);
     if (isNaN(rows) || rows <= 0 || isNaN(cols) || cols <= 0) {
-        alert("Please enter valid positive numbers for rows and columns."); hideLoading(); return; }
+        imageMessage.textContent = "Please enter valid positive numbers for rows and columns.";
+        imageMessage.style.color = 'red';
+        hideLoading();
+        return;
+    }
     const imgWidth = uploadedImage.naturalWidth; const imgHeight = uploadedImage.naturalHeight;
     const pieceWidth = Math.floor(imgWidth / cols); const pieceHeight = Math.floor(imgHeight / rows);
     const splitImagesDataUrls = [];
@@ -611,18 +720,41 @@ function displaySplitImages(dataUrls) {
     splitImagesDisplay.innerHTML = ''; splitImagesDisplay.style.display = 'flex';
     imageResultImg.style.display = 'none'; imageCanvas.style.display = 'none';
     imageDownloadLink.style.display = 'none';
+    const zip = new JSZip();
+    const zipFilename = getDownloadFilename('split-image-filename', 'split_images.zip', 'zip');
+
     dataUrls.forEach((dataUrl, index) => {
         const imgLink = document.createElement('a'); imgLink.href = dataUrl;
-        imgLink.download = `split-image-${index + 1}.png`;
+        imgLink.download = `split-image-${index + 1}.png`; // Individual download name
         const img = document.createElement('img'); img.src = dataUrl;
         img.alt = `Split Image ${index + 1}`; img.title = `Download Split Image ${index + 1}`;
         imgLink.appendChild(img); splitImagesDisplay.appendChild(imgLink);
+
+        // Add to zip file
+        const base64Data = dataUrl.split(',')[1];
+        zip.file(`split-image-${index + 1}.png`, base64Data, { base64: true });
     });
+
+    zip.generateAsync({ type: "blob" })
+        .then(function (content) {
+            const url = URL.createObjectURL(content);
+            imageDownloadLink.href = url;
+            imageDownloadLink.download = zipFilename;
+            imageDownloadLink.style.display = 'inline-block';
+            imageMessage.textContent = `Successfully split image into ${dataUrls.length} pieces. Download as ZIP.`;
+            imageMessage.style.color = '#28a745';
+        })
+        .finally(() => hideLoading());
 }
+
 
 // Implements horizontal/vertical flip
 function flipImage(direction) {
-    if (!uploadedImage) { alert("Please upload an image first."); return; }
+    if (!uploadedImage) {
+        imageMessage.textContent = "Please upload an image first.";
+        imageMessage.style.color = 'orange';
+        return;
+    }
     showLoading(); saveImageState();
     const tempCanvas = document.createElement('canvas'); const tempCtx = tempCanvas.getContext('2d');
     tempCanvas.width = uploadedImage.naturalWidth; tempCanvas.height = uploadedImage.naturalHeight;
@@ -630,15 +762,23 @@ function flipImage(direction) {
     else if (direction === 'vertical') { tempCtx.translate(0, tempCanvas.height); tempCtx.scale(1, -1); }
     tempCtx.drawImage(uploadedImage, 0, 0);
     const flippedDataUrl = tempCanvas.toDataURL('image/png');
+    const filename = getDownloadFilename('flip-image-filename', `flipped-${direction}-image.png`, 'png');
     const newFlippedImage = new Image(); newFlippedImage.onload = () => {
-        uploadedImage = newFlippedImage; updateImageResult(flippedDataUrl, `flipped-${direction}-image.png`);
-        currentImageState = flippedDataUrl; hideLoading(); };
+        uploadedImage = newFlippedImage; updateImageResult(flippedDataUrl, filename);
+        currentImageState = flippedDataUrl; hideLoading();
+        imageMessage.textContent = `Image flipped ${direction}ly successfully!`;
+        imageMessage.style.color = '#28a745';
+    };
     newFlippedImage.src = flippedDataUrl;
 }
 
 // Implements 90-degree rotations
 function rotateImage(degrees) {
-    if (!uploadedImage) { alert("Please upload an image first."); return; }
+    if (!uploadedImage) {
+        imageMessage.textContent = "Please upload an image first.";
+        imageMessage.style.color = 'orange';
+        return;
+    }
     showLoading(); saveImageState();
     const tempCanvas = document.createElement('canvas'); const tempCtx = tempCanvas.getContext('2d');
     const radians = degrees * Math.PI / 180;
@@ -649,16 +789,21 @@ function rotateImage(degrees) {
     tempCtx.translate(newWidth / 2, newHeight / 2); tempCtx.rotate(radians);
     tempCtx.drawImage(uploadedImage, -uploadedImage.naturalWidth / 2, -uploadedImage.naturalHeight / 2);
     const rotatedDataUrl = tempCanvas.toDataURL('image/png');
+    const filename = getDownloadFilename('rotate-image-filename', `rotated-${degrees}-image.png`, 'png');
     const newRotatedImage = new Image(); newRotatedImage.onload = () => {
-        uploadedImage = newRotatedImage; updateImageResult(rotatedDataUrl, `rotated-${degrees}-image.png`);
-        currentImageState = rotatedDataUrl; hideLoading(); };
+        uploadedImage = newRotatedImage; updateImageResult(rotatedDataUrl, filename);
+        currentImageState = rotatedDataUrl; hideLoading();
+        imageMessage.textContent = `Image rotated ${degrees}° successfully!`;
+        imageMessage.style.color = '#28a745';
+    };
     newRotatedImage.src = rotatedDataUrl;
 }
 
 // Implements Image Enlarger (simple scaling)
 function enlargeImage() {
     if (!uploadedImage) {
-        alert("Please upload an image first.");
+        imageMessage.textContent = "Please upload an image first.";
+        imageMessage.style.color = 'orange';
         return;
     }
     showLoading();
@@ -666,7 +811,8 @@ function enlargeImage() {
 
     const scaleFactor = parseFloat(enlargerScaleInput.value);
     if (isNaN(scaleFactor) || scaleFactor <= 0) {
-        alert("Please enter a valid positive number for the scale factor.");
+        imageMessage.textContent = "Please enter a valid positive number for the scale factor.";
+        imageMessage.style.color = 'red';
         hideLoading();
         return;
     }
@@ -687,12 +833,15 @@ function enlargeImage() {
     tempCtx.drawImage(uploadedImage, 0, 0, newWidth, newHeight);
 
     const enlargedDataUrl = tempCanvas.toDataURL('image/png');
+    const filename = getDownloadFilename('image-enlarger-filename', `enlarged-image-x${scaleFactor}.png`, 'png');
     const newEnlargedImage = new Image();
     newEnlargedImage.onload = () => {
         uploadedImage = newEnlargedImage;
-        updateImageResult(enlargedDataUrl, `enlarged-image-x${scaleFactor}.png`);
+        updateImageResult(enlargedDataUrl, filename);
         currentImageState = enlargedDataUrl;
         hideLoading();
+        imageMessage.textContent = `Image enlarged by x${scaleFactor} successfully!`;
+        imageMessage.style.color = '#28a745';
     };
     newEnlargedImage.src = enlargedDataUrl;
 }
@@ -700,7 +849,11 @@ function enlargeImage() {
 
 // Implements Color Picker
 function pickColor(e) {
-    if (currentToolId !== 'color-picker' || !uploadedImage) return;
+    if (currentToolId !== 'color-picker' || !uploadedImage) {
+        imageMessage.textContent = "Please upload an image first to pick colors.";
+        imageMessage.style.color = 'orange';
+        return;
+    }
     const rect = imageCanvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
@@ -722,6 +875,8 @@ function pickColor(e) {
 
     pickedColorValue.textContent = `${hex} (${rgb})`;
     colorDisplayBox.style.backgroundColor = hex;
+    imageMessage.textContent = `Color picked: ${hex}`;
+    imageMessage.style.color = '#28a745';
 }
 
 // Implements Meme Generator
@@ -759,7 +914,8 @@ function drawMemeTextsOnCanvas() {
 
 function generateMeme() {
     if (!uploadedImage) {
-        alert("Please upload an image first.");
+        imageMessage.textContent = "Please upload an image first.";
+        imageMessage.style.color = 'orange';
         return;
     }
     showLoading();
@@ -791,12 +947,15 @@ function generateMeme() {
     }
 
     const memeDataUrl = tempCanvas.toDataURL('image/png');
+    const filename = getDownloadFilename('meme-generator-filename', 'generated-meme.png', 'png');
     const newMemeImage = new Image();
     newMemeImage.onload = () => {
         uploadedImage = newMemeImage;
-        updateImageResult(memeDataUrl, 'generated-meme.png');
+        updateImageResult(memeDataUrl, filename);
         currentImageState = memeDataUrl;
         hideLoading();
+        imageMessage.textContent = "Meme generated successfully!";
+        imageMessage.style.color = '#28a745';
     };
     newMemeImage.src = memeDataUrl;
 }
@@ -900,7 +1059,8 @@ memeFontFamilySelect?.addEventListener('change', () => {
 async function makeCollage() {
     const files = uploadCollageImagesInput.files;
     if (files.length === 0) {
-        alert("Please select images for the collage.");
+        imageMessage.textContent = "Please select images for the collage.";
+        imageMessage.style.color = 'orange';
         return;
     }
     const layout = collageLayoutSelect.value;
@@ -923,7 +1083,8 @@ async function makeCollage() {
         }
 
         if (loadedImages.length === 0) {
-            alert("No valid images loaded for collage.");
+            imageMessage.textContent = "No valid images loaded for collage.";
+            imageMessage.style.color = 'red';
             hideLoading();
             return;
         }
@@ -931,7 +1092,7 @@ async function makeCollage() {
         let collageCanvas = document.createElement('canvas');
         let collageCtx = collageCanvas.getContext('2d');
         let collageDataUrl;
-        let filename = 'collage.png';
+        let defaultFilename = 'collage.png';
 
         if (layout === 'horizontal') {
             let totalWidth = loadedImages.reduce((sum, img) => sum + img.naturalWidth, 0);
@@ -954,7 +1115,12 @@ async function makeCollage() {
                 currentY += img.naturalHeight;
             });
         } else if (layout === '2x2') {
-            if (loadedImages.length < 4) { alert("Please upload at least 4 images for a 2x2 grid."); hideLoading(); return; }
+            if (loadedImages.length < 4) {
+                imageMessage.textContent = "Please upload at least 4 images for a 2x2 grid.";
+                imageMessage.style.color = 'orange';
+                hideLoading();
+                return;
+            }
             const img1 = loadedImages[0], img2 = loadedImages[1], img3 = loadedImages[2], img4 = loadedImages[3];
             const cellWidth = Math.max(img1.naturalWidth, img2.naturalWidth, img3.naturalWidth, img4.naturalWidth);
             const cellHeight = Math.max(img1.naturalHeight, img2.naturalHeight, img3.naturalHeight, img4.naturalHeight);
@@ -964,9 +1130,14 @@ async function makeCollage() {
             collageCtx.drawImage(img2, cellWidth, 0, cellWidth, cellHeight);
             collageCtx.drawImage(img3, 0, cellHeight, cellWidth, cellHeight);
             collageCtx.drawImage(img4, cellWidth, cellHeight, cellWidth, cellHeight);
-            filename = 'collage_2x2.png';
+            defaultFilename = 'collage_2x2.png';
         } else if (layout === '1x2') { // One top, two below
-            if (loadedImages.length < 3) { alert("Please upload at least 3 images for a 1x2 layout."); hideLoading(); return; }
+            if (loadedImages.length < 3) {
+                imageMessage.textContent = "Please upload at least 3 images for a 1x2 layout.";
+                imageMessage.style.color = 'orange';
+                hideLoading();
+                return;
+            }
             const img1 = loadedImages[0], img2 = loadedImages[1], img3 = loadedImages[2];
             const topWidth = img1.naturalWidth;
             const bottomWidth = Math.max(img2.naturalWidth, img3.naturalWidth);
@@ -984,9 +1155,14 @@ async function makeCollage() {
             const bottomHeight = Math.max(img2.naturalHeight, img3.naturalHeight);
             collageCtx.drawImage(img2, (totalWidth / 2 - img2.naturalWidth) / 2, bottomY, img2.naturalWidth, bottomHeight); // Centered in left half
             collageCtx.drawImage(img3, totalWidth / 2 + (totalWidth / 2 - img3.naturalWidth) / 2, bottomY, img3.naturalWidth, bottomHeight); // Centered in right half
-            filename = 'collage_1x2.png';
+            defaultFilename = 'collage_1x2.png';
         } else if (layout === '2x1') { // Two top, one below
-            if (loadedImages.length < 3) { alert("Please upload at least 3 images for a 2x1 layout."); hideLoading(); return; }
+            if (loadedImages.length < 3) {
+                imageMessage.textContent = "Please upload at least 3 images for a 2x1 layout.";
+                imageMessage.style.color = 'orange';
+                hideLoading();
+                return;
+            }
             const img1 = loadedImages[0], img2 = loadedImages[1], img3 = loadedImages[2];
             const topWidth = Math.max(img1.naturalWidth, img2.naturalWidth);
             const bottomWidth = img3.naturalWidth;
@@ -1003,10 +1179,11 @@ async function makeCollage() {
 
             // Draw bottom image centered
             collageCtx.drawImage(img3, (totalWidth - img3.naturalWidth) / 2, topHeight, img3.naturalWidth, img3.naturalHeight);
-            filename = 'collage_2x1.png';
+            defaultFilename = 'collage_2x1.png';
         }
 
         collageDataUrl = collageCanvas.toDataURL('image/png');
+        const filename = getDownloadFilename('collage-maker-filename', defaultFilename, 'png');
         const newCollageImage = new Image();
         newCollageImage.onload = () => {
             uploadedImage = newCollageImage;
@@ -1029,6 +1206,54 @@ async function makeCollage() {
     }
 }
 
+// Implements Merge Images (Legacy)
+async function mergeImages() {
+    if (!uploadedImage || !uploadedImage2) {
+        imageMessage.textContent = "Please upload both images first for merging.";
+        imageMessage.style.color = 'orange';
+        return;
+    }
+    showLoading();
+    saveImageState();
+
+    const mergeDirection = document.getElementById('merge-direction').value;
+    const tempCanvas = document.createElement('canvas');
+    const tempCtx = tempCanvas.getContext('2d');
+
+    let mergedWidth, mergedHeight;
+    if (mergeDirection === 'horizontal') {
+        mergedWidth = uploadedImage.naturalWidth + uploadedImage2.naturalWidth;
+        mergedHeight = Math.max(uploadedImage.naturalHeight, uploadedImage2.naturalHeight);
+    } else { // vertical
+        mergedWidth = Math.max(uploadedImage.naturalWidth, uploadedImage2.naturalWidth);
+        mergedHeight = uploadedImage.naturalHeight + uploadedImage2.naturalHeight;
+    }
+
+    tempCanvas.width = mergedWidth;
+    tempCanvas.height = mergedHeight;
+
+    tempCtx.drawImage(uploadedImage, 0, 0);
+    if (mergeDirection === 'horizontal') {
+        tempCtx.drawImage(uploadedImage2, uploadedImage.naturalWidth, 0);
+    } else {
+        tempCtx.drawImage(uploadedImage2, 0, uploadedImage.naturalHeight);
+    }
+
+    const mergedDataUrl = tempCanvas.toDataURL('image/png');
+    const filename = getDownloadFilename('merge-images-filename', 'merged-image.png', 'png');
+
+    const newMergedImage = new Image();
+    newMergedImage.onload = () => {
+        uploadedImage = newMergedImage;
+        updateImageResult(mergedDataUrl, filename);
+        currentImageState = mergedDataUrl;
+        hideLoading();
+        imageMessage.textContent = "Images merged successfully!";
+        imageMessage.style.color = '#28a745';
+    };
+    newMergedImage.src = mergedDataUrl;
+}
+
 
 // Undoes the last operation in the image editor
 function undoLastImageOperation() {
@@ -1039,17 +1264,289 @@ function undoLastImageOperation() {
         const img = new Image();
         img.onload = () => {
             uploadedImage = img; updateCanvasWithImage(img);
-            updateImageResult(img.src); hideLoading(); };
+            updateImageResult(img.src); hideLoading();
+            imageMessage.textContent = "Last operation undone.";
+            imageMessage.style.color = '#28a745';
+        };
         img.src = lastState;
         if (imageHistory.length === 0) { imageUndoButton.disabled = true; }
     } else {
-        alert("No more operations to undo. Clearing image display.");
+        imageMessage.textContent = "No more operations to undo. Clearing image display.";
+        imageMessage.style.color = 'orange';
         uploadedImage = null; currentImageState = null;
         imageResultImg.style.display = 'none'; imageCanvas.style.display = 'none';
         imageDownloadLink.style.display = 'none'; splitImagesDisplay.innerHTML = '';
         splitImagesDisplay.style.display = 'none'; imageUndoButton.disabled = true;
-        imageMessage.textContent = 'Upload an image to get started.';
         hideLoading();
+    }
+}
+
+// Convert Any File to Image functionality
+let selectedFileToConvert = null; // Store the file object
+
+uploadFileToImageInput?.addEventListener('change', function(e) {
+    selectedFileToConvert = e.target.files[0];
+    if (selectedFileToConvert) {
+        detectedFileTypeSpan.textContent = selectedFileToConvert.type || 'Unknown';
+        // Check if the file type is directly convertible to an image
+        if (selectedFileToConvert.type.startsWith('image/')) {
+            conversionStatusSpan.textContent = 'Ready for conversion to other image formats.';
+            conversionStatusSpan.style.color = '#28a745'; // Green
+            convertFileToImageButton.disabled = false;
+        } else if (selectedFileToConvert.type === 'application/pdf') {
+            conversionStatusSpan.textContent = 'PDF to Image conversion supported (renders first page).';
+            conversionStatusSpan.style.color = '#28a745'; // Green
+            convertFileToImageButton.disabled = false;
+        } else if (selectedFileToConvert.type.startsWith('text/') || selectedFileToConvert.type === 'application/json' || selectedFileToConvert.type === 'application/xml') {
+            conversionStatusSpan.textContent = 'Text-based file. Will convert content to image. Complex layouts may not be preserved.';
+            conversionStatusSpan.style.color = 'orange'; // Orange for warning
+            convertFileToImageButton.disabled = false;
+        }
+        else {
+            conversionStatusSpan.textContent = 'Conversion not directly supported. Will attempt to render as plain text or a placeholder.';
+            conversionStatusSpan.style.color = 'red'; // Red for unsupported
+            convertFileToImageButton.disabled = false; // Still allow trying
+        }
+    } else {
+        detectedFileTypeSpan.textContent = 'N/A';
+        conversionStatusSpan.textContent = 'Please upload a file.';
+        conversionStatusSpan.style.color = '#666';
+        convertFileToImageButton.disabled = true;
+    }
+});
+
+convertFileToImageButton?.addEventListener('click', convertFileToImage);
+
+async function convertFileToImage() {
+    if (!selectedFileToConvert) {
+        imageMessage.textContent = "Please upload a file first.";
+        imageMessage.style.color = 'orange';
+        return;
+    }
+    showLoading();
+    imageMessage.textContent = ''; // Clear previous messages
+
+    const targetFormat = targetImageFormatSelect.value;
+    const fileNameWithoutExt = selectedFileToConvert.name.split('.').slice(0, -1).join('.'); // Get name without extension
+    const outputExtension = targetFormat.split('/')[1].replace('jpeg', 'jpg');
+    const filename = getDownloadFilename('convert-to-image-filename', `${fileNameWithoutExt}-converted.${outputExtension}`, outputExtension);
+
+    let imageDataUrl = null;
+
+    try {
+        if (selectedFileToConvert.type.startsWith('image/')) {
+            // If it's already an image, just convert format
+            const reader = new FileReader();
+            reader.readAsDataURL(selectedFileToConvert);
+            await new Promise(resolve => reader.onload = resolve);
+            const img = new Image();
+            img.src = reader.result;
+            await new Promise(resolve => img.onload = resolve);
+
+            const tempCanvas = document.createElement('canvas');
+            const tempCtx = tempCanvas.getContext('2d');
+            tempCanvas.width = img.naturalWidth;
+            tempCanvas.height = img.naturalHeight;
+            tempCtx.drawImage(img, 0, 0);
+            imageDataUrl = tempCanvas.toDataURL(targetFormat);
+
+        } else if (selectedFileToConvert.type === 'application/pdf') {
+            // PDF to Image conversion (renders first page)
+            const arrayBuffer = await selectedFileToConvert.arrayBuffer();
+            const pdfjsLib = window['pdfjs-dist/build/pdf'];
+            // Ensure worker path is correct. This needs to be relative to the server if not using CDN.
+            // For CDN, it often works implicitly or needs an explicit path.
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.189/pdf.worker.min.mjs';
+
+            const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+            const pdf = await loadingTask.promise;
+            const page = await pdf.getPage(1); // Render the first page
+
+            const viewport = page.getViewport({ scale: 1.5 }); // Adjust scale as needed for better quality
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
+
+            await page.render({ canvasContext: context, viewport: viewport }).promise;
+            imageDataUrl = canvas.toDataURL(targetFormat);
+
+        } else if (selectedFileToConvert.type.startsWith('text/') || selectedFileToConvert.type === 'application/json' || selectedFileToConvert.type === 'application/xml') {
+            // Text file to image (simple rendering on canvas)
+            const textContent = await selectedFileToConvert.text();
+            const tempCanvas = document.createElement('canvas');
+            const tempCtx = tempCanvas.getContext('2d');
+
+            // Dynamic canvas size based on text content (rough estimate)
+            const fontSize = 16;
+            const lineHeight = 20;
+            const maxWidth = 800; // Max width for text wrapping
+            tempCtx.font = `${fontSize}px Arial`;
+
+            const lines = textContent.split('\n');
+            let currentY = lineHeight;
+            let currentMaxLineWidth = 0;
+
+            // Calculate height and width for canvas
+            for (const line of lines) {
+                const words = line.split(' ');
+                let currentLine = '';
+                for (const word of words) {
+                    const testLine = currentLine === '' ? word : currentLine + ' ' + word;
+                    const metrics = tempCtx.measureText(testLine);
+                    if (metrics.width > maxWidth && currentLine !== '') {
+                        currentY += lineHeight;
+                        currentMaxLineWidth = Math.max(currentMaxLineWidth, tempCtx.measureText(currentLine).width);
+                        currentLine = word;
+                    } else {
+                        currentLine = testLine;
+                    }
+                }
+                currentY += lineHeight;
+                currentMaxLineWidth = Math.max(currentMaxLineWidth, tempCtx.measureText(currentLine).width);
+            }
+
+            tempCanvas.width = Math.min(currentMaxLineWidth + 40, 1200); // Add padding, cap max width
+            tempCanvas.height = currentY + 40; // Add padding
+
+            tempCtx.fillStyle = '#FFFFFF';
+            tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+            tempCtx.font = `${fontSize}px Arial`;
+            tempCtx.fillStyle = '#000000';
+            tempCtx.textBaseline = 'top';
+            let drawY = 20; // Initial Y for drawing
+
+            // Redraw text on resized canvas
+            for (const line of lines) {
+                const words = line.split(' ');
+                let currentLine = '';
+                for (const word of words) {
+                    const testLine = currentLine === '' ? word : currentLine + ' ' + word;
+                    const metrics = tempCtx.measureText(testLine);
+                    if (metrics.width > maxWidth && currentLine !== '') {
+                        tempCtx.fillText(currentLine, 20, drawY);
+                        drawY += lineHeight;
+                        currentLine = word;
+                    } else {
+                        currentLine = testLine;
+                    }
+                }
+                tempCtx.fillText(currentLine, 20, drawY);
+                drawY += lineHeight;
+            }
+
+            imageDataUrl = tempCanvas.toDataURL(targetFormat);
+
+        } else {
+            // For other unsupported file types, create a placeholder image
+            const tempCanvas = document.createElement('canvas');
+            const tempCtx = tempCanvas.getContext('2d');
+            tempCanvas.width = 600;
+            tempCanvas.height = 400;
+            tempCtx.fillStyle = '#f0f0f0';
+            tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+            tempCtx.fillStyle = '#333';
+            tempCtx.font = '20px Arial';
+            tempCtx.textAlign = 'center';
+            tempCtx.fillText('Unsupported File Type', tempCanvas.width / 2, tempCanvas.height / 2 - 20);
+            tempCtx.fillText(`Cannot convert "${selectedFileToConvert.type}" to image.`, tempCanvas.width / 2, tempCanvas.height / 2 + 10);
+            imageDataUrl = tempCanvas.toDataURL(targetFormat);
+        }
+
+        const newImage = new Image();
+        newImage.onload = () => {
+            uploadedImage = newImage; // Set the result as the new uploaded image
+            updateImageResult(imageDataUrl, filename);
+            currentImageState = imageDataUrl;
+            imageMessage.textContent = 'File converted to image successfully!';
+            imageMessage.style.color = '#28a745';
+            hideLoading();
+        };
+        newImage.src = imageDataUrl;
+
+    } catch (error) {
+        console.error("Error converting file to image:", error);
+        imageMessage.textContent = `Error during conversion: ${error.message}. Please try another file.`;
+        imageMessage.style.color = 'red';
+        hideLoading();
+    }
+}
+
+// Logo Design Functionality
+async function generateLogo() {
+    const description = logoDescriptionInput.value.trim();
+    if (!description) {
+        imageMessage.textContent = "Please enter a description for your logo idea.";
+        imageMessage.style.color = 'orange';
+        return;
+    }
+
+    showLoading();
+    imageMessage.textContent = 'Generating your logo... this might take a moment.';
+    imageMessage.style.color = '#007bff';
+    imageDownloadLink.style.display = 'none'; // Hide download link until ready
+    imageCanvas.style.display = 'none';
+    imageResultImg.style.display = 'none';
+
+    // Construct a more specific prompt for logo generation
+    const prompt = `Generate a professional and aesthetically pleasing logo for a business/concept described as: "${description}". The logo should be iconic, modern, and ideally minimalistic, focusing on a single, clear visual concept. Ensure it is distinct and scalable.`;
+
+    try {
+        console.log("Sending API request for logo generation...");
+        const payload = { instances: { prompt: prompt }, parameters: { "sampleCount": 1 } };
+        const apiKey = ""; // Canvas will automatically provide the API key
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${apiKey}`;
+
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        console.log("API response status:", response.status);
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error("API Error Response:", errorData);
+            throw new Error(`API error: ${response.status} - ${errorData.error?.message || response.statusText}`);
+        }
+
+        const result = await response.json();
+        console.log("API Result:", result);
+
+        if (result.predictions && result.predictions.length > 0 && result.predictions[0].bytesBase64Encoded) {
+            const imageDataUrl = `data:image/png;base64,${result.predictions[0].bytesBase64Encoded}`;
+            const filename = getDownloadFilename('logo-design-filename', 'my-new-logo.png', 'png');
+
+            const newLogoImage = new Image();
+            newLogoImage.onload = () => {
+                uploadedImage = newLogoImage; // Update the main image reference
+                updateImageResult(imageDataUrl, filename);
+                currentImageState = imageDataUrl;
+                imageMessage.textContent = 'Logo generated successfully!';
+                imageMessage.style.color = '#28a745';
+                hideLoading();
+                console.log("Logo displayed and download link set.");
+            };
+            newLogoImage.onerror = () => {
+                console.error("Failed to load generated image from data URL.");
+                throw new Error("Failed to load generated image.");
+            };
+            newLogoImage.src = imageDataUrl;
+
+        } else {
+            console.warn("API response missing image data or unexpected structure.", result);
+            throw new Error("No image data received from the API or unexpected response structure.");
+        }
+
+    } catch (error) {
+        console.error("Caught error during logo generation:", error);
+        imageMessage.textContent = `Error: Could not generate logo. ${error.message}. Please try again with a different description.`;
+        imageMessage.style.color = 'red';
+        hideLoading();
+        // Clear previous result if any
+        imageResultImg.style.display = 'none';
+        imageDownloadLink.style.display = 'none';
     }
 }
 
@@ -1063,11 +1560,13 @@ async function imageConverter() {
     const targetFormat = imageConvertFormatSelect.value;
 
     if (!file) {
-        alert("Please select an image file to convert.");
+        convertMessage.textContent = "Please select an image file to convert.";
+        convertMessage.style.color = 'orange';
         return;
     }
     if (!file.type.startsWith('image/')) {
-        alert("Please select a valid image file.");
+        convertMessage.textContent = "Please select a valid image file.";
+        convertMessage.style.color = 'red';
         return;
     }
 
@@ -1095,10 +1594,10 @@ async function imageConverter() {
 
         const convertedDataUrl = tempCanvas.toDataURL(targetFormat);
         const extension = targetFormat.split('/')[1].replace('jpeg', 'jpg');
-        const fileName = `${file.name.replace(/\.[^/.]+$/, "")}.${extension}`;
+        const filename = getDownloadFilename('image-converter-filename', `${file.name.replace(/\.[^/.]+$/, "")}.${extension}`, extension);
 
         convertDownloadLink.href = convertedDataUrl;
-        convertDownloadLink.download = fileName;
+        convertDownloadLink.download = filename;
         convertDownloadLink.style.display = 'inline-block';
         convertMessage.textContent = `Successfully converted to ${extension.toUpperCase()}!`;
         convertMessage.style.color = '#28a745';
@@ -1126,6 +1625,101 @@ async function imageConverter() {
     }
 }
 
+// PDF to JPG conversion using pdf.js
+async function pdfToJpg() {
+    const file = uploadPdfToJpgInput.files[0];
+    if (!file) {
+        convertMessage.textContent = "Please select a PDF file.";
+        convertMessage.style.color = 'orange';
+        return;
+    }
+    if (file.type !== 'application/pdf') {
+        convertMessage.textContent = "Please select a valid PDF file.";
+        convertMessage.style.color = 'red';
+        return;
+    }
+
+    showLoading();
+    convertMessage.style.display = 'none';
+    convertDownloadLink.style.display = 'none';
+    bulkConvertResultsDisplay.innerHTML = '';
+    bulkConvertResultsDisplay.style.display = 'none';
+
+    try {
+        // PDF.js is loaded as a module in index.html
+        const pdfjsLib = window['pdfjs-dist/build/pdf'];
+        // Set the workerSrc to the correct path where pdf.worker.min.mjs is located
+        // This is crucial for pdf.js to work correctly in the browser.
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.189/pdf.worker.min.mjs';
+
+        const arrayBuffer = await file.arrayBuffer();
+        const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+        const pdf = await loadingTask.promise;
+
+        const numPages = pdf.numPages;
+        const zip = new JSZip(); // To zip multiple JPGs if needed
+        const zipFilename = getDownloadFilename('pdf-to-jpg-filename', `${file.name.replace(/\.[^/.]+$/, "")}_converted_pages.zip`, 'zip');
+
+
+        for (let i = 1; i <= numPages; i++) {
+            const page = await pdf.getPage(i);
+            const viewport = page.getViewport({ scale: 1.5 }); // Render at 1.5x resolution for better quality
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
+
+            await page.render({ canvasContext: context, viewport: viewport }).promise;
+
+            const imageDataUrl = canvas.toDataURL('image/jpeg', 0.9); // Convert to JPEG with 90% quality
+            const pageFilename = `${file.name.replace(/\.[^/.]+$/, "")}_page_${i}.jpg`;
+
+            // Display preview for each page
+            const imgLink = document.createElement('a');
+            imgLink.href = imageDataUrl;
+            imgLink.download = pageFilename;
+            const imgElement = document.createElement('img');
+            imgElement.src = imageDataUrl;
+            imgElement.alt = `Page ${i}`;
+            imgElement.style.maxWidth = '200px';
+            imgElement.style.maxHeight = '200px';
+            imgLink.appendChild(imgElement);
+            bulkConvertResultsDisplay.appendChild(imgLink);
+
+            // Add to zip file
+            const base64Data = imageDataUrl.split(',')[1];
+            zip.file(pageFilename, base64Data, { base64: true });
+        }
+
+        if (numPages > 0) {
+            zip.generateAsync({ type: "blob" })
+                .then(function (content) {
+                    const url = URL.createObjectURL(content);
+                    convertDownloadLink.href = url;
+                    convertDownloadLink.download = zipFilename;
+                    convertDownloadLink.style.display = 'inline-block';
+                    convertMessage.textContent = `Converted ${numPages} PDF page(s) to JPG. Download as ZIP.`;
+                    convertMessage.style.color = '#28a745';
+                    convertMessage.style.display = 'block';
+                    bulkConvertResultsDisplay.style.display = 'flex'; // Show the preview container
+                });
+        } else {
+            convertMessage.textContent = 'No pages found in PDF or failed to convert.';
+            convertMessage.style.color = 'red';
+            convertMessage.style.display = 'block';
+        }
+
+    } catch (error) {
+        console.error("Error converting PDF to JPG:", error);
+        convertMessage.textContent = `Error: Could not convert PDF to JPG. ${error.message}. Try another PDF.`;
+        convertMessage.style.color = 'red';
+        convertMessage.style.display = 'block';
+    } finally {
+        hideLoading();
+    }
+}
+
+
 // SVG to PNG/JPG Converter
 async function svgConverter() {
     const fileInput = document.getElementById('upload-svg-converter-input');
@@ -1133,11 +1727,13 @@ async function svgConverter() {
     const targetFormat = svgConvertFormatSelect.value;
 
     if (!file) {
-        alert("Please select an SVG file to convert.");
+        convertMessage.textContent = "Please select an SVG file to convert.";
+        convertMessage.style.color = 'orange';
         return;
     }
     if (file.type !== 'image/svg+xml') {
-        alert("Please select a valid SVG file.");
+        convertMessage.textContent = "Please select a valid SVG file.";
+        convertMessage.style.color = 'red';
         return;
     }
 
@@ -1173,10 +1769,10 @@ async function svgConverter() {
 
         const convertedDataUrl = tempCanvas.toDataURL(targetFormat);
         const extension = targetFormat.split('/')[1].replace('jpeg', 'jpg');
-        const fileName = `${file.name.replace(/\.[^/.]+$/, "")}.${extension}`;
+        const filename = getDownloadFilename('svg-converter-filename', `${file.name.replace(/\.[^/.]+$/, "")}.${extension}`, extension);
 
         convertDownloadLink.href = convertedDataUrl;
-        convertDownloadLink.download = fileName;
+        convertDownloadLink.download = filename;
         convertDownloadLink.style.display = 'inline-block';
         convertMessage.textContent = `Successfully converted to ${extension.toUpperCase()}!`;
         convertMessage.style.color = '#28a745';
@@ -1207,26 +1803,42 @@ async function svgConverter() {
 
 async function mergePdfs() {
     const files = uploadPdfsInput.files;
-    if (files.length === 0) { alert("Please select at least one PDF file to merge."); return; }
+    if (files.length === 0) {
+        pdfMessage.textContent = "Please select at least one PDF file to merge.";
+        pdfMessage.style.color = 'orange';
+        return;
+    }
     showLoading(); pdfMessage.style.display = 'none'; pdfDownloadLink.style.display = 'none';
     try {
         const pdfDoc = await PDFLib.PDFDocument.create();
+        let processedCount = 0;
         for (let i = 0; i < files.length; i++) {
             const file = files[i];
-            if (file.type !== 'application/pdf') { console.warn(`Skipping non-PDF file: ${file.name}`); continue; }
+            if (file.type !== 'application/pdf') {
+                console.warn(`Skipping non-PDF file: ${file.name}`);
+                continue;
+            }
             const arrayBuffer = await file.arrayBuffer();
             const donorPdfDoc = await PDFLib.PDFDocument.load(arrayBuffer);
             const copiedPages = await pdfDoc.copyPages(donorPdfDoc, donorPdfDoc.getPageIndices());
             copiedPages.forEach((page) => pdfDoc.addPage(page));
+            processedCount++;
         }
-        if (pdfDoc.getPages().length === 0) { alert("No valid PDF files were found or processed for merging."); hideLoading(); return; }
+        if (processedCount === 0) {
+            pdfMessage.textContent = "No valid PDF files were found or processed for merging.";
+            pdfMessage.style.color = 'red';
+            hideLoading();
+            return;
+        }
         const pdfBytes = await pdfDoc.save(); const blob = new Blob([pdfBytes], { type: 'application/pdf' });
         const url = URL.createObjectURL(blob);
-        pdfDownloadLink.href = url; pdfDownloadLink.download = 'merged_document.pdf';
+        const filename = getDownloadFilename('merge-pdf-filename', 'merged_document.pdf', 'pdf');
+        pdfDownloadLink.href = url; pdfDownloadLink.download = filename;
         pdfDownloadLink.style.display = 'inline-block';
         pdfMessage.textContent = 'PDF merged successfully!'; pdfMessage.style.color = '#28a745';
         pdfMessage.style.display = 'block';
-    } catch (error) { console.error("Error merging PDFs:", error);
+    } catch (error) {
+        console.error("Error merging PDFs:", error);
         pdfMessage.textContent = `Error: Could not merge PDFs. ${error.message}`;
         pdfMessage.style.color = 'red'; pdfMessage.style.display = 'block';
     } finally { hideLoading(); }
@@ -1239,11 +1851,13 @@ async function compressPdf() {
     const imageQuality = parseFloat(pdfCompressQuality.value); // This quality will be used if we re-embed images
 
     if (!file) {
-        alert("Please select a PDF file to compress.");
+        pdfMessage.textContent = "Please select a PDF file to compress.";
+        pdfMessage.style.color = 'orange';
         return;
     }
     if (file.type !== 'application/pdf') {
-        alert("Please select a valid PDF file.");
+        pdfMessage.textContent = "Please select a valid PDF file.";
+        pdfMessage.style.color = 'red';
         return;
     }
 
@@ -1257,20 +1871,6 @@ async function compressPdf() {
 
         const newPdfDoc = await PDFLib.PDFDocument.create();
 
-        // This implementation will attempt to copy pages and re-embed existing images if they are
-        // directly accessible as common image types (like JPG, PNG) within the PDF's XObjects.
-        // For complex PDFs with different image encodings or advanced content, this might not
-        // fully re-compress all images, but it will apply general PDF stream compression.
-
-        // A more robust image recompression within a PDF requires deep parsing of PDF content streams
-        // to identify image objects, extract their raw data, re-encode them (e.g., via canvas for
-        // raster images) at the desired quality, and then replace the original image objects
-        // with the new compressed ones. This is very complex client-side.
-
-        // For simplicity and client-side feasibility, this implementation will primarily rely on
-        // `pdf-lib`'s built-in compression when saving the new PDF, and for images it *can* re-embed
-        // it will apply the specified quality.
-
         for (const page of pdfDoc.getPages()) {
             const { width, height } = page.getSize();
             const newPage = newPdfDoc.addPage([width, height]);
@@ -1278,44 +1878,19 @@ async function compressPdf() {
             // Copy original content stream
             const contentStream = await page.getContents();
             newPage.setContents(contentStream);
-
-            // Attempt to re-embed images with new quality (simplified)
-            // This is a complex area in PDF manipulation. `pdf-lib` doesn't provide a direct
-            // API to "recompress existing image XObjects".
-            // The following approach is more conceptual for client-side limitations.
-            // A truly comprehensive PDF compressor requires a deeper level of PDF object manipulation
-            // to extract, re-encode, and replace image streams.
-
-            // The main compression benefit comes from the `save()` options.
-            // You can, however, iterate through all pages and their resources, and for `XObject`s
-            // that are images, you'd hypothetically:
-            // 1. Get the image bytes.
-            // 2. Decode them into a format `canvas` can use (e.g., ImageData).
-            // 3. Draw on a temporary canvas and then `toDataURL('image/jpeg', imageQuality)`.
-            // 4. Embed the new compressed image into `newPdfDoc`.
-            // 5. Crucially, replace the old image's reference in the new PDF's resource dictionary
-            //    and update any content streams that refer to it. This last step is very hard with `pdf-lib`'s
-            //    current high-level API.
-
-            // Given this, the `compressPdf` function will mainly rely on `pdf-lib`'s default
-            // compression settings when saving, which often applies stream compression and might
-            // re-encode some types of embedded images (like uncompressed ones) to a more efficient format.
-            // Explicit image re-compression of *all* existing embedded images in a PDF is beyond the
-            // current scope and practical client-side capability without much more complex libraries.
         }
 
         const pdfBytes = await newPdfDoc.save({
             use: [PDFLib.Default="PDFDefault", PDFLib.FlateStream, PDFLib.JPEG], // Apply general stream compression and optimize JPEGs
             updateMetadata: true, // Update metadata
-            // For explicitly setting image quality on *embedded* JPEG images, when creating new ones:
-            // JPEG: { quality: imageQuality } // This applies only to newly embedded JPEGs
         });
 
         const blob = new Blob([pdfBytes], { type: 'application/pdf' });
         const url = URL.createObjectURL(blob);
 
+        const filename = getDownloadFilename('compress-pdf-filename', `compressed_${file.name}`, 'pdf');
         pdfDownloadLink.href = url;
-        pdfDownloadLink.download = `compressed_${file.name}`;
+        pdfDownloadLink.download = filename;
         pdfDownloadLink.style.display = 'inline-block';
         pdfMessage.textContent = 'PDF processed for compression (stream compression applied)!';
         pdfMessage.style.color = '#28a745';
@@ -1333,11 +1908,16 @@ async function compressPdf() {
 
 
 // Common function for converting images to PDF (used by Image to PDF, JPG to PDF, PNG to PDF)
-async function convertImagesToPdf(files, outputFileName = 'images_to_pdf.pdf') {
-    if (files.length === 0) { alert("Please select at least one image file to convert to PDF."); return; }
+async function convertImagesToPdf(files, outputFileName = 'images_to_pdf.pdf', filenameInputId) {
+    if (files.length === 0) {
+        pdfMessage.textContent = "Please select at least one image file to convert to PDF.";
+        pdfMessage.style.color = 'orange';
+        return;
+    }
     showLoading(); pdfMessage.style.display = 'none'; pdfDownloadLink.style.display = 'none';
     try {
         const pdfDoc = await PDFLib.PDFDocument.create();
+        let processedCount = 0;
         for (let i = 0; i < files.length; i++) {
             const file = files[i];
             if (!file.type.startsWith('image/jpeg') && !file.type.startsWith('image/png') && !file.type.startsWith('image/webp')) {
@@ -1375,23 +1955,85 @@ async function convertImagesToPdf(files, outputFileName = 'images_to_pdf.pdf') {
             const { width, height } = image.scale(Math.min(page.getWidth() / image.width, page.getHeight() / image.height));
             const x = (page.getWidth() - width) / 2; const y = (page.getHeight() - height) / 2;
             page.drawImage(image, { x, y, width, height });
+            processedCount++;
         }
-        if (pdfDoc.getPages().length === 0) { alert("No supported images (JPEG, PNG, or WebP) were found to convert to PDF."); hideLoading(); return; }
+        if (processedCount === 0) {
+            pdfMessage.textContent = "No supported images (JPEG, PNG, or WebP) were found to convert to PDF.";
+            pdfMessage.style.color = 'red';
+            hideLoading();
+            return;
+        }
         const pdfBytes = await pdfDoc.save(); const blob = new Blob([pdfBytes], { type: 'application/pdf' });
         const url = URL.createObjectURL(blob);
-        pdfDownloadLink.href = url; pdfDownloadLink.download = outputFileName;
+        const filename = getDownloadFilename(filenameInputId, outputFileName, 'pdf');
+        pdfDownloadLink.href = url; pdfDownloadLink.download = filename;
         pdfDownloadLink.style.display = 'inline-block';
         pdfMessage.textContent = 'Images converted to PDF successfully!'; pdfMessage.style.color = '#28a745';
         pdfMessage.style.display = 'block';
-    } catch (error) { console.error("Error converting images to PDF:", error);
+    } catch (error) {
+        console.error("Error converting images to PDF:", error);
         pdfMessage.textContent = `Error: Could not convert images to PDF. ${error.message}`;
         pdfMessage.style.color = 'red'; pdfMessage.style.display = 'block';
     } finally { hideLoading(); }
 }
 
-async function imagesToPdf() { await convertImagesToPdf(uploadImagesToPdfInput.files, 'images_to_pdf.pdf'); }
-async function jpgsToPdf() { await convertImagesToPdf(uploadJpgsToPdfInput.files, 'jpgs_to_pdf.pdf'); }
-async function pngsToPdf() { await convertImagesToPdf(uploadPngsToPdfInput.files, 'pngs_to_pdf.pdf'); }
+async function imagesToPdf() { await convertImagesToPdf(uploadImagesToPdfInput.files, 'images_to_pdf.pdf', 'image-to-pdf-filename'); }
+async function jpgsToPdf() { await convertImagesToPdf(uploadJpgsToPdfInput.files, 'jpgs_to_pdf.pdf', 'jpg-to-pdf-filename'); }
+async function pngsToPdf() { await convertImagesToPdf(uploadPngsToPdfInput.files, 'pngs_to_pdf.pdf', 'png-to-pdf-filename'); }
+
+
+// --- VIDEO TOOLS FUNCTIONS (PLACEHOLDERS) ---
+
+// This section is a placeholder for video editing functionalities.
+// Client-side video processing (trimming, adding/removing audio, watermarking, converting)
+// is highly complex and requires specialized libraries that are typically large (e.g., FFmpeg.WASM).
+// Implementing these features fully would significantly increase the bundle size and complexity
+// of this simple demo application.
+// For now, these functions will only display messages.
+
+async function handleVideoUploadCommon(e) {
+    const file = e.target.files[0];
+    if (file) {
+        videoMessage.textContent = `Video selected: ${file.name}. Functionality not yet implemented.`;
+        videoMessage.style.color = '#555';
+        videoDownloadLink.style.display = 'none'; // Ensure download link is hidden
+    } else {
+        videoMessage.textContent = 'Upload a video to get started.';
+        videoMessage.style.color = '#666';
+    }
+}
+
+// These functions would contain the complex video processing logic
+function addMusicToVideo() {
+    videoMessage.textContent = "Adding music to video functionality coming soon! Requires advanced video/audio libraries.";
+    videoMessage.style.color = '#ffc107'; // Yellow for warning/coming soon
+}
+
+function removeBackgroundMusic() {
+    videoMessage.textContent = "Removing background music functionality coming soon! Requires advanced audio processing.";
+    videoMessage.style.color = '#ffc107';
+}
+
+function adjustBackgroundMusic() {
+    videoMessage.textContent = "Adjusting background music volume functionality coming soon! Requires advanced audio processing.";
+    videoMessage.style.color = '#ffc107';
+}
+
+// These are placeholders for other video tools
+function trimVideo() {
+    videoMessage.textContent = "Video trimming functionality coming soon! Requires advanced video processing.";
+    videoMessage.style.color = '#ffc107';
+}
+
+function convertVideo() {
+    videoMessage.textContent = "Video conversion functionality coming soon! Requires advanced video encoding.";
+    videoMessage.style.color = '#ffc107';
+}
+
+function addWatermark() {
+    videoMessage.textContent = "Adding watermark functionality coming soon! Requires advanced video processing.";
+    videoMessage.style.color = '#ffc107';
+}
 
 
 // --- APPS TOOLS FUNCTIONS (PLACEHOLDERS) ---
@@ -1451,13 +2093,26 @@ imageUploadArea.addEventListener('dragover', highlight, false);
 imageUploadArea.addEventListener('drop', function(e) {
     const dt = e.dataTransfer;
     const files = dt.files;
-    if (files.length > 0 && files[0].type.startsWith('image/')) {
-        const dataTransfer = new DataTransfer();
-        dataTransfer.items.add(files[0]);
-        uploadImageCommonInput.files = dataTransfer.files;
-        uploadImageCommonInput.dispatchEvent(new Event('change', { bubbles: true }));
+    if (files.length > 0) { // No longer strict image type check here, let specific tools handle
+        // If 'Convert Any File to Image' is the active tool, direct drop to its input
+        if (currentToolId === 'convert-to-image') {
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(files[0]);
+            uploadFileToImageInput.files = dataTransfer.files;
+            uploadFileToImageInput.dispatchEvent(new Event('change', { bubbles: true }));
+            imageMessage.textContent = `Dropped file. Click "Convert to Image".`;
+            imageMessage.style.color = '#555';
+        } else if (files[0].type.startsWith('image/')) { // For other image tools, only accept images
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(files[0]);
+            uploadImageCommonInput.files = dataTransfer.files;
+            uploadImageCommonInput.dispatchEvent(new Event('change', { bubbles: true }));
+        } else {
+             imageMessage.textContent = "Only image files are supported for this tool via drag and drop.";
+             imageMessage.style.color = 'orange';
+        }
     } else {
-        alert("Please drop an image file.");
+        imageMessage.textContent = "Please drop a file.";
     }
 });
 
@@ -1488,7 +2143,8 @@ uploadImageCommonInput.addEventListener('change', function (e) {
                 imageUndoButton.disabled = true;
             };
             img.onerror = () => {
-                alert("Could not load image. Please ensure it's a valid image file.");
+                imageMessage.textContent = "Could not load image. Please ensure it's a valid image file.";
+                imageMessage.style.color = 'red';
                 hideLoading();
             };
             img.src = event.target.result;
@@ -1506,10 +2162,12 @@ uploadMerge2Input?.addEventListener('change', function (e) {
             const img2 = new Image();
             img2.onload = () => {
                 uploadedImage2 = img2;
-                alert("Second image loaded for merging.");
+                imageMessage.textContent = `Second image loaded: ${file.name}.`;
+                imageMessage.style.color = '#28a745';
             };
             img2.onerror = () => {
-                alert("Could not load second image. Please ensure it's a valid image file.");
+                imageMessage.textContent = "Could not load second image. Please ensure it's a valid image file.";
+                imageMessage.style.color = 'red';
             };
             img2.src = event.target.result;
         };
@@ -1589,8 +2247,16 @@ convertUploadArea.addEventListener('drop', function(e) {
             uploadSvgConverterInput.dispatchEvent(new Event('change', { bubbles: true }));
             convertMessage.textContent = `Dropped 1 file. Click "Convert SVG" button.`;
             convertMessage.style.color = '#555';
-        } else {
-            convertMessage.textContent = `Dropped ${files.length} file(s). Functionality not yet implemented for this tool.`;
+        } else if (currentToolId === 'pdf-to-jpg' && files[0].type === 'application/pdf') { // Handle PDF to JPG drop
+             const dataTransfer = new DataTransfer();
+             dataTransfer.items.add(files[0]);
+             uploadPdfToJpgInput.files = dataTransfer.files;
+             uploadPdfToJpgInput.dispatchEvent(new Event('change', { bubbles: true }));
+             convertMessage.textContent = `Dropped 1 PDF file. Click "Convert PDF to JPG".`;
+             convertMessage.style.color = '#555';
+        }
+        else {
+            convertMessage.textContent = `Dropped ${files.length} file(s). Functionality not yet implemented for this tool or unsupported file type.`;
             convertMessage.style.color = '#555';
         }
     } else {
@@ -1598,6 +2264,31 @@ convertUploadArea.addEventListener('drop', function(e) {
         convertMessage.style.color = 'orange';
     }
 });
+
+// Video Upload Area (Drag and Drop) - NEW
+videoUploadArea.addEventListener('dragenter', preventDefaults, false);
+videoUploadArea.addEventListener('dragover', preventDefaults, false);
+videoUploadArea.addEventListener('dragleave', unhighlight, false);
+videoUploadArea.addEventListener('drop', unhighlight, false);
+videoUploadArea.addEventListener('dragenter', highlight, false);
+videoUploadArea.addEventListener('dragover', highlight, false);
+
+videoUploadArea.addEventListener('drop', function(e) {
+    const dt = e.dataTransfer;
+    const files = dt.files;
+    if (files.length > 0 && files[0].type.startsWith('video/')) {
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(files[0]);
+        uploadVideoCommonInput.files = dataTransfer.files;
+        uploadVideoCommonInput.dispatchEvent(new Event('change', { bubbles: true })); // Trigger change
+    } else {
+        videoMessage.textContent = 'Please drop a video file.';
+        videoMessage.style.color = 'orange';
+    }
+});
+
+// Listen for file selection on the common video upload input - NEW
+uploadVideoCommonInput.addEventListener('change', handleVideoUploadCommon);
 
 
 // --- INITIAL SETUP ---

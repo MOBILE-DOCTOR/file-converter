@@ -40,6 +40,8 @@
                     <button class="overview-tool-button" data-tool="image-enlarger" data-category="image-tools">Image Enlarger</button>
                     <button class="overview-tool-button" data-tool="color-picker" data-category="image-tools">Color Picker</button>
                     <button class="overview-tool-button" data-tool="meme-generator" data-category="image-tools">Meme Generator</button>
+                    <button class="overview-tool-button" data-tool="convert-to-image" data-category="image-tools">Convert to Image</button>
+                    <button class="overview-tool-button" data-tool="logo-design" data-category="image-tools">Logo Design</button>
                 </div>
                 <button class="overview-category-button" data-category="image-tools">View All Image Tools</button>
             </div>
@@ -75,6 +77,17 @@
             </div>
 
             <div class="overview-category-card">
+                <h3>Video Tools</h3>
+                <div class="tool-list">
+                    <button class="overview-tool-button" data-tool="video-editor" data-category="video-tools">Video Editor</button>
+                    <button class="overview-tool-button" data-tool="video-trimmer" data-category="video-tools">Video Trimmer</button>
+                    <button class="overview-tool-button" data-tool="video-converter" data-category="video-tools">Video Converter</button>
+                    <button class="overview-tool-button" data-tool="add-watermark" data-category="video-tools">Add Watermark</button>
+                </div>
+                <button class="overview-category-button" data-category="video-tools">View All Video Tools</button>
+            </div>
+
+            <div class="overview-category-card">
                 <h3>Apps</h3>
                 <div class="tool-list">
                     <button class="overview-tool-button" data-tool="android-image-converter-app" data-category="apps-tools">Android Image Converter App</button>
@@ -105,6 +118,8 @@
                 <button class="tool-button" data-tool="image-enlarger">Image Enlarger</button>
                 <button class="tool-button" data-tool="color-picker">Color Picker</button>
                 <button class="tool-button" data-tool="meme-generator">Meme Generator</button>
+                <button class="tool-button" data-tool="convert-to-image">Convert to Image</button>
+                <button class="tool-button" data-tool="logo-design">Logo Design</button>
             </div>
 
             <!-- Common Image Upload Area -->
@@ -127,6 +142,10 @@
                         <input type="number" id="height" placeholder="e.g. 250" value="200">
                     </div>
                     <button onclick="resizeImage()">Apply Resize</button>
+                    <div class="input-group">
+                        <label for="image-resizer-filename">Download Filename:</label>
+                        <input type="text" id="image-resizer-filename" placeholder="resized-image.png" value="resized-image.png">
+                    </div>
                 </div>
 
                 <div id="bulk-image-resizer-options" class="tool-section">
@@ -145,6 +164,10 @@
                         <input type="file" id="upload-bulk-images" accept="image/*" multiple>
                     </div>
                     <button onclick="bulkImageResizer()">Apply Bulk Resize</button>
+                    <div class="input-group">
+                        <label for="bulk-image-resizer-filename">Download Filename (ZIP):</label>
+                        <input type="text" id="bulk-image-resizer-filename" placeholder="resized_images.zip" value="resized_images.zip">
+                    </div>
                 </div>
 
                 <div id="image-compressor-options" class="tool-section">
@@ -164,12 +187,20 @@
                         </select>
                     </div>
                     <button onclick="compressImage()">Apply Compress</button>
+                    <div class="input-group">
+                        <label for="image-compressor-filename">Download Filename:</label>
+                        <input type="text" id="image-compressor-filename" placeholder="compressed-image.png">
+                    </div>
                 </div>
 
                 <div id="crop-image-options" class="tool-section">
                     <h3>Crop Image</h3>
                     <p>Drag on the image preview below to select the crop area.</p>
                     <button onclick="cropImage()">Apply Crop</button>
+                    <div class="input-group">
+                        <label for="crop-image-filename">Download Filename:</label>
+                        <input type="text" id="crop-image-filename" placeholder="cropped-image.png" value="cropped-image.png">
+                    </div>
                 </div>
 
                 <div id="collage-maker-options" class="tool-section">
@@ -190,6 +221,10 @@
                         </select>
                     </div>
                     <button onclick="makeCollage()">Make Collage</button>
+                    <div class="input-group">
+                        <label for="collage-maker-filename">Download Filename:</label>
+                        <input type="text" id="collage-maker-filename" placeholder="collage.png" value="collage.png">
+                    </div>
                 </div>
 
                 <div id="flip-image-options" class="tool-section">
@@ -197,6 +232,10 @@
                     <p>Flip the image horizontally or vertically.</p>
                     <button onclick="flipImage('horizontal')">Flip Horizontally</button>
                     <button onclick="flipImage('vertical')">Flip Vertically</button>
+                    <div class="input-group">
+                        <label for="flip-image-filename">Download Filename:</label>
+                        <input type="text" id="flip-image-filename" placeholder="flipped-image.png" value="flipped-image.png">
+                    </div>
                 </div>
 
                 <div id="rotate-image-options" class="tool-section">
@@ -204,6 +243,10 @@
                     <p>Rotate the image by 90 degrees clockwise or counter-clockwise.</p>
                     <button onclick="rotateImage(90)">Rotate 90° CW</button>
                     <button onclick="rotateImage(-90)">Rotate 90° CCW</button>
+                    <div class="input-group">
+                        <label for="rotate-image-filename">Download Filename:</label>
+                        <input type="text" id="rotate-image-filename" placeholder="rotated-image.png" value="rotated-image.png">
+                    </div>
                 </div>
 
                 <div id="image-enlarger-options" class="tool-section">
@@ -214,6 +257,10 @@
                         <input type="number" id="enlarger-scale" placeholder="e.g. 2" value="2" min="1" step="0.1">
                     </div>
                     <button onclick="enlargeImage()">Enlarge Image</button>
+                    <div class="input-group">
+                        <label for="image-enlarger-filename">Download Filename:</label>
+                        <input type="text" id="image-enlarger-filename" placeholder="enlarged-image.png" value="enlarged-image.png">
+                    </div>
                 </div>
 
                 <div id="color-picker-options" class="tool-section">
@@ -221,6 +268,7 @@
                     <p>Click on the image below to pick a color.</p>
                     <div class="color-display-box" id="color-display-box" style="width:50px; height:20px; border:1px solid #ccc; background-color: #f0f0f0;"></div>
                     <p>Selected Color: <span id="picked-color-value">#FFFFFF</span></p>
+                    <!-- No download for color picker itself, it's an interactive tool -->
                 </div>
 
                 <div id="meme-generator-options" class="tool-section">
@@ -249,6 +297,48 @@
                         </select>
                     </div>
                     <button onclick="generateMeme()">Generate Meme</button>
+                    <div class="input-group">
+                        <label for="meme-generator-filename">Download Filename:</label>
+                        <input type="text" id="meme-generator-filename" placeholder="generated-meme.png" value="generated-meme.png">
+                    </div>
+                </div>
+
+                <div id="convert-to-image-options" class="tool-section">
+                    <h3>Convert Any File to Image</h3>
+                    <p>Upload a file and convert it to an image format. Note: Complex file types will not be fully converted and will show a placeholder.</p>
+                    <div class="input-group">
+                        <label for="upload-file-to-image">File to Convert:</label>
+                        <input type="file" id="upload-file-to-image" accept="*/*">
+                    </div>
+                    <p>Detected File Type: <span id="detected-file-type">N/A</span></p>
+                    <p>Conversion Status: <span id="conversion-status">Please upload a file.</span></p>
+                    <div class="input-group">
+                        <label for="target-image-format">Convert To:</label>
+                        <select id="target-image-format">
+                            <option value="image/png">PNG</option>
+                            <option value="image/jpeg">JPG</option>
+                            <option value="image/webp">WebP</option>
+                        </select>
+                    </div>
+                    <button id="convert-file-to-image-button" disabled>Convert to Image</button>
+                    <div class="input-group">
+                        <label for="convert-to-image-filename">Download Filename:</label>
+                        <input type="text" id="convert-to-image-filename" placeholder="converted-file.png" value="converted-file.png">
+                    </div>
+                </div>
+
+                <div id="logo-design-options" class="tool-section">
+                    <h3>Logo Design</h3>
+                    <p>Create unique logos, designs, graphics, and more using AI. Describe your idea below!</p>
+                    <div class="input-group">
+                        <label for="logo-description">Logo Idea:</label>
+                        <input type="text" id="logo-description" placeholder="e.g., minimalist lion logo for a tech company">
+                    </div>
+                    <button onclick="generateLogo()">Generate Logo</button>
+                    <div class="input-group">
+                        <label for="logo-design-filename">Download Filename:</label>
+                        <input type="text" id="logo-design-filename" placeholder="my-new-logo.png" value="my-new-logo.png">
+                    </div>
                 </div>
 
                 <!-- Legacy Merge and Split (kept for backward compatibility, new users should use Collage/Bulk) -->
@@ -267,6 +357,10 @@
                         </select>
                     </div>
                     <button onclick="mergeImages()">Apply Merge</button>
+                    <div class="input-group">
+                        <label for="merge-images-filename">Download Filename:</label>
+                        <input type="text" id="merge-images-filename" placeholder="merged-image.png" value="merged-image.png">
+                    </div>
                 </div>
 
                 <div id="split-options" class="tool-section">
@@ -281,6 +375,10 @@
                         <input type="number" id="split-cols" value="2" min="1">
                     </div>
                     <button onclick="splitImage()">Apply Split</button>
+                    <div class="input-group">
+                        <label for="split-image-filename">Download Filename (ZIP):</label>
+                        <input type="text" id="split-image-filename" placeholder="split_images.zip" value="split_images.zip">
+                    </div>
                 </div>
             </div>
 
@@ -334,12 +432,20 @@
                         <input type="file" id="upload-image-converter-input" accept="image/*">
                     </div>
                     <button onclick="imageConverter()">Convert Image</button>
+                    <div class="input-group">
+                        <label for="image-converter-filename">Download Filename:</label>
+                        <input type="text" id="image-converter-filename" placeholder="converted-image.jpg" value="converted-image.jpg">
+                    </div>
                 </div>
                 <div id="pdf-to-jpg-options" class="tool-section">
-                    <h3>PDF to JPG (Coming Soon)</h3>
+                    <h3>PDF to JPG</h3>
                     <p>Convert pages from a PDF document to JPG images. This feature requires a large client-side PDF rendering library (<a href="https://mozilla.github.io/pdf.js/" target="_blank" class="external-link">pdf.js</a> or similar) which is not included to keep the app lightweight.</p>
-                    <input type="file" id="upload-pdf-to-jpg" accept=".pdf" disabled>
-                    <button disabled>Convert PDF to JPG</button>
+                    <input type="file" id="upload-pdf-to-jpg" accept=".pdf">
+                    <button onclick="pdfToJpg()">Convert PDF to JPG</button>
+                    <div class="input-group">
+                        <label for="pdf-to-jpg-filename">Download Filename (ZIP):</label>
+                        <input type="text" id="pdf-to-jpg-filename" placeholder="converted_pdf_pages.zip" value="converted_pdf_pages.zip">
+                    </div>
                 </div>
                 <div id="heic-to-jpg-options" class="tool-section">
                     <h3>HEIC to JPG (Coming Soon)</h3>
@@ -362,6 +468,10 @@
                         <input type="file" id="upload-svg-converter-input" accept=".svg">
                     </div>
                     <button onclick="svgConverter()">Convert SVG</button>
+                    <div class="input-group">
+                        <label for="svg-converter-filename">Download Filename:</label>
+                        <input type="text" id="svg-converter-filename" placeholder="converted-svg.png" value="converted-svg.png">
+                    </div>
                 </div>
                 <div id="pdf-to-png-options" class="tool-section">
                     <h3>PDF to PNG (Coming Soon)</h3>
@@ -424,6 +534,10 @@
                         <input type="file" id="upload-pdfs" accept=".pdf" multiple>
                     </div>
                     <button onclick="mergePdfs()">Merge PDFs</button>
+                    <div class="input-group">
+                        <label for="merge-pdf-filename">Download Filename:</label>
+                        <input type="text" id="merge-pdf-filename" placeholder="merged_document.pdf" value="merged_document.pdf">
+                    </div>
                 </div>
 
                 <div id="compress-pdf-options" class="tool-section">
@@ -439,6 +553,10 @@
                         <input type="file" id="upload-compress-pdf" accept=".pdf">
                     </div>
                     <button onclick="compressPdf()">Compress PDF</button>
+                    <div class="input-group">
+                        <label for="compress-pdf-filename">Download Filename:</label>
+                        <input type="text" id="compress-pdf-filename" placeholder="compressed_document.pdf" value="compressed_document.pdf">
+                    </div>
                 </div>
 
                 <div id="pdf-converter-options" class="tool-section">
@@ -462,6 +580,10 @@
                         <input type="file" id="upload-images-to-pdf" accept="image/*" multiple>
                     </div>
                     <button onclick="imagesToPdf()">Convert to PDF</button>
+                    <div class="input-group">
+                        <label for="image-to-pdf-filename">Download Filename:</label>
+                        <input type="text" id="image-to-pdf-filename" placeholder="images_to_pdf.pdf" value="images_to_pdf.pdf">
+                    </div>
                 </div>
 
                 <div id="jpg-to-pdf-options" class="tool-section">
@@ -472,6 +594,10 @@
                         <input type="file" id="upload-jpgs-to-pdf" accept=".jpg,.jpeg" multiple>
                     </div>
                     <button onclick="jpgsToPdf()">Convert JPG to PDF</button>
+                    <div class="input-group">
+                        <label for="jpg-to-pdf-filename">Download Filename:</label>
+                        <input type="text" id="jpg-to-pdf-filename" placeholder="jpgs_to_pdf.pdf" value="jpgs_to_pdf.pdf">
+                    </div>
                 </div>
 
                 <div id="png-to-pdf-options" class="tool-section">
@@ -482,6 +608,10 @@
                         <input type="file" id="upload-pngs-to-pdf" accept=".png" multiple>
                     </div>
                     <button onclick="pngsToPdf()">Convert PNG to PDF</button>
+                    <div class="input-group">
+                        <label for="png-to-pdf-filename">Download Filename:</label>
+                        <input type="text" id="png-to-pdf-filename" placeholder="pngs_to_pdf.pdf" value="pngs_to_pdf.pdf">
+                    </div>
                 </div>
 
                 <div id="pdf-to-gif-options" class="tool-section">
@@ -498,6 +628,62 @@
             </div>
         </div>
 
+        <!-- Video Tools Category -->
+        <div id="video-tools-category-section" class="main-view category-view">
+            <h2>Video Tools</h2>
+            <div class="tool-selection-buttons">
+                <button class="tool-button active" data-tool="video-editor">Video Editor</button>
+                <button class="tool-button" data-tool="video-trimmer">Video Trimmer</button>
+                <button class="tool-button" data-tool="video-converter">Video Converter</button>
+                <button class="tool-button" data-tool="add-watermark">Add Watermark</button>
+            </div>
+
+            <div class="file-upload-area" id="video-upload-area">
+                <p>Drag & Drop a video file here, or click to select</p>
+                <input type="file" id="upload-video-common" accept="video/*">
+            </div>
+
+            <div id="video-tool-options-container" class="tool-options-container">
+                <div id="video-editor-options" class="tool-section active">
+                    <h3>Video Editor (Coming Soon)</h3>
+                    <p>Edit, trim, and craft your videos with features like:
+                        <ul>
+                            <li>Adding other music to video</li>
+                            <li>Removing background music</li>
+                            <li>Adjusting background music volume</li>
+                        </ul>
+                        This feature requires powerful client-side video and audio processing libraries like <a href="https://ffmpegwasm.netlify.app/" target="_blank" class="external-link">FFmpeg.WASM</a>, which are not included to keep the app lightweight.
+                    </p>
+                    <input type="file" accept="video/*" disabled>
+                    <button disabled>Start Editing</button>
+                </div>
+                 <div id="video-trimmer-options" class="tool-section">
+                    <h3>Video Trimmer (Coming Soon)</h3>
+                    <p>Trim sections from your videos. This feature requires client-side video processing.</p>
+                    <input type="file" accept="video/*" disabled>
+                    <button disabled>Trim Video</button>
+                </div>
+                <div id="video-converter-options" class="tool-section">
+                    <h3>Video Converter (Coming Soon)</h3>
+                    <p>Convert video formats. This feature requires client-side video encoding.</p>
+                    <input type="file" accept="video/*" disabled>
+                    <button disabled>Convert Video</button>
+                </div>
+                <div id="add-watermark-options" class="tool-section">
+                    <h3>Add Watermark (Coming Soon)</h3>
+                    <p>Add a text or image watermark to your videos. This feature requires client-side video processing.</p>
+                    <input type="file" accept="video/*" disabled>
+                    <button disabled>Add Watermark</button>
+                </div>
+            </div>
+
+            <div class="editor-area video-editor-area">
+                <p id="video-message" class="editor-message">Upload a video to get started.</p>
+                <a id="video-download" style="display: none;" class="download-button" href="#" download="processed_video.mp4">Download Video</a>
+            </div>
+        </div>
+
+
         <!-- Apps Category -->
         <div id="apps-tools-category-section" class="main-view category-view">
             <h2>Mobile Apps</h2>
@@ -506,8 +692,9 @@
                 <button class="tool-button" data-tool="ios-image-converter-app">iOS Image Converter</button>
                 <button class="tool-button" data-tool="android-collage-maker-app">Android Collage Maker</button>
                 <button class="tool-button" data-tool="ios-collage-maker-app">iOS Collage Maker</button>
-                <button class="tool-button" data-tool="android-video-compressor-app">Android Video Compressor App</button>
-                <button class="tool-button" data-tool="ios-video-compressor-app">iOS Video Compressor App</button>
+                <button class="tool-button" data-tool="android-video-compressor-app" data-category="apps-tools">Android Video Compressor App</button>
+                <button class="tool-button" data-tool="ios-video-compressor-app" data-category="apps-tools">iOS Video Compressor App</button>
+                <button class="tool-button" data-tool="desktop-video-converter-app" data-category="apps-tools">Desktop Video Converter</button>
             </div>
 
             <div id="apps-tool-options-container" class="tool-options-container">
@@ -535,6 +722,10 @@
                     <h3>iOS Video Compressor App (Coming Soon)</h3>
                     <p>Information about our iOS Video Compressor App will be here. Stay tuned for download links!</p>
                 </div>
+                <div id="desktop-video-converter-app-options" class="tool-section">
+                    <h3>Desktop Video Converter (Coming Soon)</h3>
+                    <p>Information about our Desktop Video Converter application will be here. This would be a standalone application for more robust video conversions.</p>
+                </div>
             </div>
 
             <div class="editor-area apps-editor-area">
@@ -545,6 +736,11 @@
   </div>
   <!-- PDF-LIB CDN -->
   <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+  <!-- JSZip CDN for bulk image download -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
+  <!-- PDF.js CDN for PDF rendering (Full build, includes worker) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.189/pdf.min.mjs" type="module"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.189/pdf.worker.min.mjs" type="module"></script>
   <script src="script.js"></script>
 </body>
 </html>
